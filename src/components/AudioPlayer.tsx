@@ -32,16 +32,18 @@ export function AudioPlayer({
   const [segmentUrls, setSegmentUrls] = useState<string[]>([])
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Generate audio segments when text or hexagram changes
+  // Generate enhanced audio segments when text or hexagram changes
   useEffect(() => {
     if (hexagram && language) {
+      // Use enhanced segmentation for hexagram audio
       const audioSegments = createAudioSegments(hexagram, language)
       setSegments(audioSegments)
-      generateSegmentAudio(audioSegments)
+      generateEnhancedSegmentAudio(audioSegments)
     } else if (text && language) {
-      // Fallback to single text
-      setSegments([text])
-      generateSingleAudio(text)
+      // Enhanced single text processing
+      const processedText = preprocessTextForSpeech(text, language)
+      setSegments([processedText])
+      generateEnhancedSingleAudio(processedText)
     }
   }, [text, language, hexagram])
 
@@ -55,13 +57,14 @@ export function AudioPlayer({
     }
   }, [segmentUrls, audioUrl])
 
-  const generateSegmentAudio = async (audioSegments: string[]) => {
+  const generateEnhancedSegmentAudio = async (audioSegments: string[]) => {
     setIsLoading(true)
     try {
       const urls: string[] = []
       
       for (let i = 0; i < audioSegments.length; i++) {
         const segment = audioSegments[i]
+        // Enhanced preprocessing for more natural speech
         const processedText = preprocessTextForSpeech(segment, language)
         
         const response = await fetch('/api/text-to-speech', {
@@ -72,12 +75,13 @@ export function AudioPlayer({
           body: JSON.stringify({
             text: processedText,
             language,
+            enhanced: true, // Flag for enhanced processing
           }),
         })
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.error || 'Failed to generate audio')
+          throw new Error(errorData.error || 'Failed to generate enhanced audio')
         }
 
         const audioBlob = await response.blob()
@@ -92,15 +96,16 @@ export function AudioPlayer({
         setIsPlaying(true)
       }
     } catch (error) {
-      console.error('Error generating segment audio:', error)
+      console.error('Error generating enhanced segment audio:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const generateSingleAudio = async (singleText: string) => {
+  const generateEnhancedSingleAudio = async (singleText: string) => {
     setIsLoading(true)
     try {
+      // Enhanced preprocessing for more natural speech
       const processedText = preprocessTextForSpeech(singleText, language)
       
       const response = await fetch('/api/text-to-speech', {
@@ -111,12 +116,13 @@ export function AudioPlayer({
         body: JSON.stringify({
           text: processedText,
           language,
+          enhanced: true, // Flag for enhanced processing
         }),
       })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to generate audio')
+        throw new Error(errorData.error || 'Failed to generate enhanced audio')
       }
 
       const audioBlob = await response.blob()
@@ -133,7 +139,7 @@ export function AudioPlayer({
         setIsPlaying(true)
       }
     } catch (error) {
-      console.error('Error generating audio:', error)
+      console.error('Error generating enhanced audio:', error)
     } finally {
       setIsLoading(false)
     }
