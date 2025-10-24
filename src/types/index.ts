@@ -37,8 +37,11 @@ export interface HexagramTranslation {
   number: number;
   name: MultiLanguageText;
   chineseName: string;
+  chinese_name?: string; // Database field name
   upperTrigram: string;
+  upper_trigram?: string; // Database field name
   lowerTrigram: string;
+  lower_trigram?: string; // Database field name
   judgement: MultiLanguageText;
   image: MultiLanguageText;
   lines: HexagramLineTranslation[];
