@@ -29,6 +29,7 @@ export interface MultiLanguageText {
   es: string;
   fr: string;
   ja: string;
+  [key: string]: string;
 }
 
 export interface HexagramTranslation {

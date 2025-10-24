@@ -21,9 +21,13 @@ export default function DrawPage() {
   useEffect(() => {
     const loadHexagrams = async () => {
       try {
-        const response = await fetch('/data/hexagrams.json')
-        const data = await response.json()
-        setHexagrams(data)
+        const response = await fetch('/api/hexagrams')
+        const result = await response.json()
+        if (result.success) {
+          setHexagrams(result.data)
+        } else {
+          console.error('Failed to load hexagrams:', result.error)
+        }
       } catch (error) {
         console.error('Error loading hexagrams:', error)
       } finally {

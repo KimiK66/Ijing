@@ -1,5 +1,8 @@
 import { HexagramTranslation, SupportedLanguage } from '@/types'
 
+// Re-export types for convenience
+export type { SupportedLanguage }
+
 // Language configuration
 export const LANGUAGES = {
   en: { name: 'English', nativeName: 'English', flag: '🇺🇸' },
