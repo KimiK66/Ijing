@@ -46,7 +46,7 @@ export function HexagramCard({
           {name}
         </h3>
         <p className="text-sm text-gray-600 chinese-text">
-          {hexagram.chineseName}
+          {hexagram.chinese_name || hexagram.chineseName}
         </p>
       </div>
 
@@ -71,7 +71,7 @@ export function HexagramCard({
       {/* Trigrams */}
       <div className="text-center mb-4">
         <div className="text-sm text-gray-600">
-          {hexagram.lowerTrigram} {hexagram.upperTrigram}
+          {hexagram.lower_trigram || hexagram.lowerTrigram} {hexagram.upper_trigram || hexagram.upperTrigram}
         </div>
       </div>
 

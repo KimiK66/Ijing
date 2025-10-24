@@ -27,13 +27,19 @@ export default function HexagramPage({ params }: HexagramPageProps) {
   useEffect(() => {
     const loadHexagram = async () => {
       try {
-        // In a real app, this would fetch from your API
-        const response = await fetch('/data/hexagrams.json')
-        const data = await response.json()
-        const found = data.find((h: HexagramTranslation) => h.number.toString() === hexagramId)
-        setHexagram(found || null)
+        // Fetch individual hexagram from API endpoint
+        const response = await fetch(`/api/hexagrams/${hexagramId}`)
+        const result = await response.json()
+        
+        if (result.success) {
+          setHexagram(result.data)
+        } else {
+          console.error('Failed to load hexagram:', result.error)
+          setHexagram(null)
+        }
       } catch (error) {
         console.error('Error loading hexagram:', error)
+        setHexagram(null)
       } finally {
         setIsLoading(false)
       }

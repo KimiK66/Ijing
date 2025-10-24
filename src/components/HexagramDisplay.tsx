@@ -34,10 +34,10 @@ export function HexagramDisplay({
           {name}
         </h1>
         <p className="text-lg text-gray-600 chinese-text">
-          {hexagram.chineseName}
+          {hexagram.chinese_name || hexagram.chineseName}
         </p>
         <div className="text-sm text-gray-500 mt-2">
-          {hexagram.lowerTrigram} {hexagram.upperTrigram}
+          {hexagram.lower_trigram || hexagram.lowerTrigram} {hexagram.upper_trigram || hexagram.upperTrigram}
         </div>
       </div>
 
