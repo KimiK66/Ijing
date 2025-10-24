@@ -162,6 +162,7 @@ export default function DrawPage() {
               <AudioPlayer
                 text={`${getLocalizedText(drawnHexagram.judgement, language)} ${getLocalizedText(drawnHexagram.image, language)} ${getLocalizedText(drawnHexagram.interpretation, language)}`}
                 language={language}
+                hexagram={drawnHexagram}
                 className="w-full"
               />
             </div>

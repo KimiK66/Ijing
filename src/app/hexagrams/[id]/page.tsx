@@ -159,6 +159,7 @@ export default function HexagramPage({ params }: HexagramPageProps) {
           <AudioPlayer
             text={fullText}
             language={language}
+            hexagram={hexagram}
             className="w-full"
           />
         </div>
