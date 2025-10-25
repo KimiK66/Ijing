@@ -1,6 +1,8 @@
-# I Ching Divination Webapp
+# I Ching Divination
 
 A modern web application for exploring the ancient wisdom of the I Ching (Book of Changes) through interactive divination, personalized readings, and multi-language support.
+
+**Live Demo:** https://ijing.vercel.app
 
 ## Features
 
@@ -31,8 +33,8 @@ A modern web application for exploring the ancient wisdom of the I Ching (Book o
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd i-ching-divination-webapp
+git clone https://github.com/KimiK66/Ijing.git
+cd Ijing
 ```
 
 2. Install dependencies:

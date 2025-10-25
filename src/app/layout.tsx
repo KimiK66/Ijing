@@ -17,11 +17,11 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://i-ching-divination.vercel.app'),
+  metadataBase: new URL('https://ijing.vercel.app'),
   openGraph: {
     title: 'I Ching Divination - Ancient Wisdom for Modern Life',
     description: 'Explore the ancient wisdom of the I Ching through interactive divination, personalized readings, and multi-language support.',
-    url: 'https://i-ching-divination.vercel.app',
+    url: 'https://ijing.vercel.app',
     siteName: 'I Ching Divination',
     images: [
       {
