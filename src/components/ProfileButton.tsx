@@ -9,13 +9,8 @@ export function ProfileButton() {
   const { isAuthenticated, setIsAuthenticated, user, setUser } = useApp()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleProfileClick = async () => {
-    console.log('Profile button clicked')
-    console.log('isAuthenticated:', isAuthenticated)
-    console.log('user:', user)
-    
-    // Always start OAuth flow first - let users choose their account
-    console.log('Starting OAuth flow for profile access')
+  const handleSignIn = async () => {
+    console.log('Sign in button clicked')
     setIsLoading(true)
     
     try {
@@ -54,6 +49,22 @@ export function ProfileButton() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleProfileClick = async () => {
+    console.log('Profile button clicked')
+    console.log('isAuthenticated:', isAuthenticated)
+    console.log('user:', user)
+    
+    if (isAuthenticated && user) {
+      console.log('User is authenticated, redirecting to profile')
+      // If authenticated, redirect to profile page
+      window.location.href = '/profile'
+      return
+    }
+
+    // If not authenticated, start OAuth flow
+    await handleSignIn()
   }
 
   const handleSignOut = async (e: React.MouseEvent) => {
@@ -119,7 +130,7 @@ export function ProfileButton() {
       className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors disabled:opacity-50"
     >
       <User className="w-5 h-5" />
-          <span>{isLoading ? 'Signing in...' : 'Sign In'}</span>
+          <span>{isLoading ? 'Signing in...' : 'Profile'}</span>
     </button>
   )
 }
