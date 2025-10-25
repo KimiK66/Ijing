@@ -2,30 +2,27 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, Filter, BookOpen, Info } from 'lucide-react'
+import { BookOpen, Info } from 'lucide-react'
 import { HexagramCard } from '@/components/HexagramCard'
 import { LanguageSelector } from '@/components/LanguageSelector'
 import { useApp } from '@/app/providers'
-import { HexagramTranslation, SupportedLanguage } from '@/types'
-import { searchHexagrams, filterHexagramsByElement, filterHexagramsBySeason } from '@/lib/hexagrams'
+import { HexagramTranslation } from '@/types'
 import hexagramsData from '@/data/all-64-enhanced-hexagrams.json'
 
 export default function HexagramsPage() {
   const { language } = useApp()
   const [hexagrams, setHexagrams] = useState<HexagramTranslation[]>([])
-  const [filteredHexagrams, setFilteredHexagrams] = useState<HexagramTranslation[]>([])
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedElement, setSelectedElement] = useState('')
-  const [selectedSeason, setSelectedSeason] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
   // Load hexagrams data
   useEffect(() => {
     const loadHexagrams = async () => {
       try {
+        console.log('Loading hexagrams data...')
+        console.log('Data:', hexagramsData)
         // Use the imported hexagrams data directly
         setHexagrams(hexagramsData as HexagramTranslation[])
-        setFilteredHexagrams(hexagramsData as HexagramTranslation[])
+        console.log('Hexagrams loaded:', hexagramsData.length)
       } catch (error) {
         console.error('Error loading hexagrams:', error)
       } finally {
@@ -35,31 +32,6 @@ export default function HexagramsPage() {
 
     loadHexagrams()
   }, [])
-
-  // Filter hexagrams based on search and filters
-  useEffect(() => {
-    let filtered = hexagrams
-
-    // Apply search filter
-    if (searchQuery) {
-      filtered = searchHexagrams(filtered, searchQuery, language)
-    }
-
-    // Apply element filter
-    if (selectedElement) {
-      filtered = filterHexagramsByElement(filtered, selectedElement)
-    }
-
-    // Apply season filter
-    if (selectedSeason) {
-      filtered = filterHexagramsBySeason(filtered, selectedSeason)
-    }
-
-    setFilteredHexagrams(filtered)
-  }, [hexagrams, searchQuery, selectedElement, selectedSeason, language])
-
-  const elements = ['Metal', 'Wood', 'Water', 'Fire', 'Earth']
-  const seasons = ['Spring', 'Summer', 'Autumn', 'Winter']
 
   if (isLoading) {
     return (
@@ -124,74 +96,17 @@ export default function HexagramsPage() {
           </p>
         </div>
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <div className="grid md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search hexagrams..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Element Filter */}
-            <select
-              value={selectedElement}
-              onChange={(e) => setSelectedElement(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            >
-              <option value="">All Elements</option>
-              {elements.map((element) => (
-                <option key={element} value={element}>
-                  {element}
-                </option>
-              ))}
-            </select>
-
-            {/* Season Filter */}
-            <select
-              value={selectedSeason}
-              onChange={(e) => setSelectedSeason(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            >
-              <option value="">All Seasons</option>
-              {seasons.map((season) => (
-                <option key={season} value={season}>
-                  {season}
-                </option>
-              ))}
-            </select>
-
-            {/* Clear Filters */}
-            <button
-              onClick={() => {
-                setSearchQuery('')
-                setSelectedElement('')
-                setSelectedSeason('')
-              }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Clear Filters
-            </button>
-          </div>
-        </div>
-
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-gray-600">
-            Showing {filteredHexagrams.length} of {hexagrams.length} hexagrams
+            Showing {hexagrams.length} hexagrams
           </p>
         </div>
 
         {/* Hexagrams Grid */}
-        {filteredHexagrams.length > 0 ? (
+        {hexagrams.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredHexagrams.map((hexagram) => (
+            {hexagrams.map((hexagram) => (
               <Link
                 key={hexagram.id}
                 href={`/hexagrams/${hexagram.number}`}
@@ -208,13 +123,13 @@ export default function HexagramsPage() {
         ) : (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
-              <Search className="w-16 h-16 mx-auto" />
+              <BookOpen className="w-16 h-16 mx-auto" />
             </div>
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
               No hexagrams found
             </h3>
             <p className="text-gray-500">
-              Try adjusting your search criteria or clearing the filters.
+              There was an error loading the hexagrams data.
             </p>
           </div>
         )}

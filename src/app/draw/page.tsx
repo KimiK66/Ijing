@@ -30,8 +30,11 @@ export default function DrawPage() {
   useEffect(() => {
     const loadHexagrams = async () => {
       try {
+        console.log('Loading hexagrams data for draw page...')
+        console.log('Data:', hexagramsData)
         // Use the imported hexagrams data directly
         setHexagrams(hexagramsData as HexagramTranslation[])
+        console.log('Hexagrams loaded for draw:', hexagramsData.length)
       } catch (error) {
         console.error('Error loading hexagrams:', error)
       } finally {
