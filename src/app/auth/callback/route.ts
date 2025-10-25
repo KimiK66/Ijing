@@ -13,12 +13,15 @@ export async function GET(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         auth: {
-          flowType: 'pkce'
+          flowType: 'pkce',
+          autoRefreshToken: true,
+          persistSession: true
         }
       }
     )
     
     try {
+      // Use the proper method for PKCE code exchange
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
       
       if (error) {

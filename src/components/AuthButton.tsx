@@ -14,14 +14,13 @@ export function AuthButton() {
     setIsLoading(true)
     try {
       const supabase = createSupabaseClient()
+      
+      // Use the newer signInWithOAuth method with proper PKCE handling
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
+          skipBrowserRedirect: false
         }
       })
       
