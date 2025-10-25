@@ -3,19 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Supabase client with explicit PKCE disabled
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    flowType: 'implicit'
-  }
-})
+// Default Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Client component Supabase client with PKCE disabled
-export const createSupabaseClient = () => createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    flowType: 'implicit'
-  }
-})
+// Client component Supabase client
+export const createSupabaseClient = () => createClient(supabaseUrl, supabaseAnonKey)
 
 // Database schema types (these will be generated from Supabase)
 export interface Database {
