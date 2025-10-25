@@ -2,68 +2,166 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, BookOpen, Heart, Calendar, User } from 'lucide-react'
+import { ArrowLeft, BookOpen, Heart, Calendar, User, Plus, Edit, Trash2, Save, X } from 'lucide-react'
 import { LanguageSelector } from '@/components/LanguageSelector'
+import { AuthButton } from '@/components/AuthButton'
 import { useApp } from '@/app/providers'
-import { UserReading, UserJournal } from '@/types'
+import { UserReading, UserJournal, JournalFormData } from '@/types'
+import { createSupabaseClient } from '@/lib/supabase'
 
 export default function ProfilePage() {
-  const { language } = useApp()
+  const { language, isAuthenticated, user } = useApp()
   const [readings, setReadings] = useState<UserReading[]>([])
   const [journals, setJournals] = useState<UserJournal[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isCreatingJournal, setIsCreatingJournal] = useState(false)
+  const [editingJournal, setEditingJournal] = useState<string | null>(null)
+  const [journalForm, setJournalForm] = useState<JournalFormData>({
+    title: '',
+    content: '',
+    reading_id: undefined
+  })
 
-  // Mock data for demonstration
+  const supabase = createSupabaseClient()
+
+  // Load user data from Supabase
   useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        // Simulate loading user data
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Mock readings data
-        const mockReadings: UserReading[] = [
-          {
-            id: '1',
-            user_id: 'user-1',
-            hexagram_id: 'hexagram-01',
-            question: 'What should I focus on this week?',
-            context: 'Starting a new project',
-            timestamp: new Date().toISOString(),
-          },
-          {
-            id: '2',
-            user_id: 'user-1',
-            hexagram_id: 'hexagram-02',
-            question: 'How can I improve my relationships?',
-            context: 'Family gathering',
-            timestamp: new Date(Date.now() - 86400000).toISOString(),
-          },
-        ]
-
-        // Mock journals data
-        const mockJournals: UserJournal[] = [
-          {
-            id: '1',
-            user_id: 'user-1',
-            reading_id: '1',
-            title: 'New Project Insights',
-            content: 'The Creative hexagram provided excellent guidance for starting my new project. I feel confident about taking the initiative and leading with strength.',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ]
-
-        setReadings(mockReadings)
-        setJournals(mockJournals)
-      } catch (error) {
-        console.error('Error loading user data:', error)
-      } finally {
-        setIsLoading(false)
-      }
+    if (isAuthenticated && user) {
+      loadUserData()
+    } else {
+      setIsLoading(false)
     }
+  }, [isAuthenticated, user])
 
-    loadUserData()
-  }, [])
+  const loadUserData = async () => {
+    try {
+      setIsLoading(true)
+      
+      // Load readings
+      const { data: readingsData, error: readingsError } = await supabase
+        .from('user_readings')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('timestamp', { ascending: false })
+
+      if (readingsError) {
+        console.error('Error loading readings:', readingsError)
+      } else {
+        setReadings(readingsData || [])
+      }
+
+      // Load journals
+      const { data: journalsData, error: journalsError } = await supabase
+        .from('user_journals')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false })
+
+      if (journalsError) {
+        console.error('Error loading journals:', journalsError)
+      } else {
+        setJournals(journalsData || [])
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleCreateJournal = async () => {
+    if (!user || !journalForm.title.trim() || !journalForm.content.trim()) return
+
+    try {
+      const { data, error } = await supabase
+        .from('user_journals')
+        .insert({
+          user_id: user.id,
+          title: journalForm.title,
+          content: journalForm.content,
+          reading_id: journalForm.reading_id || null
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error creating journal:', error)
+        alert('Failed to create journal entry. Please try again.')
+      } else {
+        setJournals(prev => [data, ...prev])
+        setJournalForm({ title: '', content: '', reading_id: undefined })
+        setIsCreatingJournal(false)
+      }
+    } catch (error) {
+      console.error('Error creating journal:', error)
+      alert('Failed to create journal entry. Please try again.')
+    }
+  }
+
+  const handleUpdateJournal = async (journalId: string) => {
+    if (!journalForm.title.trim() || !journalForm.content.trim()) return
+
+    try {
+      const { data, error } = await supabase
+        .from('user_journals')
+        .update({
+          title: journalForm.title,
+          content: journalForm.content,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', journalId)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error updating journal:', error)
+        alert('Failed to update journal entry. Please try again.')
+      } else {
+        setJournals(prev => prev.map(j => j.id === journalId ? data : j))
+        setJournalForm({ title: '', content: '', reading_id: undefined })
+        setEditingJournal(null)
+      }
+    } catch (error) {
+      console.error('Error updating journal:', error)
+      alert('Failed to update journal entry. Please try again.')
+    }
+  }
+
+  const handleDeleteJournal = async (journalId: string) => {
+    if (!confirm('Are you sure you want to delete this journal entry?')) return
+
+    try {
+      const { error } = await supabase
+        .from('user_journals')
+        .delete()
+        .eq('id', journalId)
+
+      if (error) {
+        console.error('Error deleting journal:', error)
+        alert('Failed to delete journal entry. Please try again.')
+      } else {
+        setJournals(prev => prev.filter(j => j.id !== journalId))
+      }
+    } catch (error) {
+      console.error('Error deleting journal:', error)
+      alert('Failed to delete journal entry. Please try again.')
+    }
+  }
+
+  const startEditingJournal = (journal: UserJournal) => {
+    setJournalForm({
+      title: journal.title,
+      content: journal.content,
+      reading_id: journal.reading_id
+    })
+    setEditingJournal(journal.id)
+  }
+
+  const cancelEditing = () => {
+    setJournalForm({ title: '', content: '', reading_id: undefined })
+    setEditingJournal(null)
+    setIsCreatingJournal(false)
+  }
 
   if (isLoading) {
     return (
@@ -89,6 +187,7 @@ export default function ProfilePage() {
               <h1 className="text-xl font-bold text-gray-900">I Ching Divination</h1>
             </Link>
             <div className="flex items-center space-x-4">
+              <AuthButton />
               <LanguageSelector />
             </div>
           </div>
@@ -100,7 +199,9 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Profile</h1>
-            <p className="text-gray-600">Manage your readings and personal journals</p>
+            <p className="text-gray-600">
+              {isAuthenticated ? 'Manage your readings and personal journals' : 'Sign in to save your readings and create personal journals'}
+            </p>
           </div>
           <Link
             href="/"
@@ -110,6 +211,22 @@ export default function ProfilePage() {
             <span>Back to Home</span>
           </Link>
         </div>
+
+        {/* Authentication Status */}
+        {!isAuthenticated && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <div className="flex items-center space-x-3">
+              <User className="w-6 h-6 text-blue-600" />
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 mb-1">Sign in to unlock features</h3>
+                <p className="text-blue-700 mb-4">
+                  Create an account to save your readings, write personal journals, and track your I Ching journey.
+                </p>
+                <AuthButton />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -191,10 +308,67 @@ export default function ProfilePage() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Personal Journal</h2>
-            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-              New Entry
-            </button>
+            {isAuthenticated && (
+              <button 
+                onClick={() => setIsCreatingJournal(true)}
+                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span>New Entry</span>
+              </button>
+            )}
           </div>
+
+          {/* Journal Creation/Edit Form */}
+          {(isCreatingJournal || editingJournal) && (
+            <div className="bg-gray-50 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                {editingJournal ? 'Edit Journal Entry' : 'Create New Journal Entry'}
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={journalForm.title}
+                    onChange={(e) => setJournalForm(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Enter journal entry title..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Content
+                  </label>
+                  <textarea
+                    value={journalForm.content}
+                    onChange={(e) => setJournalForm(prev => ({ ...prev, content: e.target.value }))}
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Write your thoughts, insights, and reflections..."
+                  />
+                </div>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={editingJournal ? () => handleUpdateJournal(editingJournal) : handleCreateJournal}
+                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>{editingJournal ? 'Update Entry' : 'Save Entry'}</span>
+                  </button>
+                  <button
+                    onClick={cancelEditing}
+                    className="flex items-center space-x-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                    <span>Cancel</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           
           {journals.length > 0 ? (
             <div className="space-y-4">
@@ -202,11 +376,31 @@ export default function ProfilePage() {
                 <div key={journal.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium text-gray-900">{journal.title}</h3>
-                    <div className="text-sm text-gray-500">
-                      {new Date(journal.created_at).toLocaleDateString()}
+                    <div className="flex items-center space-x-2">
+                      <div className="text-sm text-gray-500">
+                        {new Date(journal.created_at).toLocaleDateString()}
+                      </div>
+                      {isAuthenticated && (
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={() => startEditingJournal(journal)}
+                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                            title="Edit entry"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteJournal(journal.id)}
+                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                            title="Delete entry"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <p className="text-gray-700 text-sm">{journal.content}</p>
+                  <p className="text-gray-700 text-sm whitespace-pre-wrap">{journal.content}</p>
                   {journal.reading_id && (
                     <div className="mt-2 text-xs text-gray-500">
                       Related to reading #{journal.reading_id}
@@ -219,10 +413,23 @@ export default function ProfilePage() {
             <div className="text-center py-8">
               <Heart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No journal entries yet</h3>
-              <p className="text-gray-600 mb-4">Start reflecting on your I Ching readings with a personal journal.</p>
-              <button className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                Create First Entry
-              </button>
+              <p className="text-gray-600 mb-4">
+                {isAuthenticated 
+                  ? 'Start reflecting on your I Ching readings with a personal journal.'
+                  : 'Sign in to create personal journal entries about your I Ching journey.'
+                }
+              </p>
+              {isAuthenticated ? (
+                <button 
+                  onClick={() => setIsCreatingJournal(true)}
+                  className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create First Entry
+                </button>
+              ) : (
+                <AuthButton />
+              )}
             </div>
           )}
         </div>

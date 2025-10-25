@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { User, LogOut, LogIn } from 'lucide-react'
 import { useApp } from '@/app/providers'
+import { createSupabaseClient } from '@/lib/supabase'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 export function AuthButton() {
   const { isAuthenticated, setIsAuthenticated, user, setUser } = useApp()
@@ -11,18 +13,18 @@ export function AuthButton() {
   const handleSignIn = async () => {
     setIsLoading(true)
     try {
-      // In a real implementation, this would redirect to Supabase Auth
-      // For now, we'll simulate authentication
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      setUser({
-        id: 'user-1',
-        email: 'user@example.com',
-        name: 'Demo User',
-        avatar_url: null,
-        created_at: new Date().toISOString(),
+      const supabase = createSupabaseClient()
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
       })
-      setIsAuthenticated(true)
+      
+      if (error) {
+        console.error('Sign in error:', error)
+        throw error
+      }
     } catch (error) {
       console.error('Sign in error:', error)
     } finally {
@@ -33,8 +35,13 @@ export function AuthButton() {
   const handleSignOut = async () => {
     setIsLoading(true)
     try {
-      // In a real implementation, this would call Supabase Auth signOut
-      await new Promise(resolve => setTimeout(resolve, 500))
+      const supabase = createSupabaseClient()
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error('Sign out error:', error)
+        throw error
+      }
       
       setUser(null)
       setIsAuthenticated(false)

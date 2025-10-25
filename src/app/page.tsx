@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { BookOpen, Shuffle, User, Globe } from 'lucide-react'
+import { BookOpen, Shuffle, User, Globe, Info } from 'lucide-react'
 import { useApp } from './providers'
 
 export default function HomePage() {
@@ -16,6 +16,13 @@ export default function HomePage() {
               <h1 className="text-xl font-bold text-gray-900">I Ching Divination</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Link
+                href="/about"
+                className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors"
+              >
+                <Info className="w-5 h-5" />
+                <span>What is I Ching?</span>
+              </Link>
               <Link
                 href="/profile"
                 className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors"

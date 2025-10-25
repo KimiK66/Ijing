@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { SupportedLanguage } from '@/types'
 import { LANGUAGES } from '@/lib/hexagrams'
+import { createSupabaseClient } from '@/lib/supabase'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface AppContextType {
   language: SupportedLanguage
@@ -40,6 +42,37 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('i-ching-language', language)
   }, [language])
+
+  // Initialize Supabase auth state
+  useEffect(() => {
+    const supabase = createSupabaseClient()
+    
+    // Get initial session
+    const getInitialSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        setUser(session.user)
+        setIsAuthenticated(true)
+      }
+    }
+    
+    getInitialSession()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user)
+          setIsAuthenticated(true)
+        } else {
+          setUser(null)
+          setIsAuthenticated(false)
+        }
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   const value = {
     language,

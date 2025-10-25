@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Volume2, BookOpen, Save } from 'lucide-react'
+import { ArrowLeft, Volume2, BookOpen, Save, Info } from 'lucide-react'
 import { HexagramDisplay } from '@/components/HexagramDisplay'
 import { AudioPlayer } from '@/components/AudioPlayer'
 import { LanguageSelector } from '@/components/LanguageSelector'
@@ -121,6 +121,20 @@ export default function HexagramPage({ params }: HexagramPageProps) {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
+              <Link
+                href="/about"
+                className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors"
+              >
+                <Info className="w-5 h-5" />
+                <span>
+                  {language === 'zh' ? '什么是易经？' :
+                   language === 'hi' ? 'आई चिंग क्या है?' :
+                   language === 'es' ? '¿Qué es el I Ching?' :
+                   language === 'fr' ? 'Qu\'est-ce que le I Ching ?' :
+                   language === 'ja' ? '易経とは？' :
+                   'What is I Ching?'}
+                </span>
+              </Link>
               <LanguageSelector />
               <Link
                 href="/profile"

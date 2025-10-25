@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, Filter, BookOpen } from 'lucide-react'
+import { Search, Filter, BookOpen, Info } from 'lucide-react'
 import { HexagramCard } from '@/components/HexagramCard'
 import { LanguageSelector } from '@/components/LanguageSelector'
 import { useApp } from '@/app/providers'
@@ -89,6 +89,20 @@ export default function HexagramsPage() {
               <h1 className="text-xl font-bold text-gray-900">I Ching Divination</h1>
             </Link>
             <div className="flex items-center space-x-4">
+              <Link
+                href="/about"
+                className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors"
+              >
+                <Info className="w-5 h-5" />
+                <span>
+                  {language === 'zh' ? '什么是易经？' :
+                   language === 'hi' ? 'आई चिंग क्या है?' :
+                   language === 'es' ? '¿Qué es el I Ching?' :
+                   language === 'fr' ? 'Qu\'est-ce que le I Ching ?' :
+                   language === 'ja' ? '易経とは？' :
+                   'What is I Ching?'}
+                </span>
+              </Link>
               <LanguageSelector />
               <Link
                 href="/profile"
