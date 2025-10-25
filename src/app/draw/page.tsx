@@ -9,7 +9,7 @@ import { LanguageSelector } from '@/components/LanguageSelector'
 import { useApp } from '@/app/providers'
 import { HexagramTranslation } from '@/types'
 import { getLocalizedText } from '@/lib/hexagrams'
-import hexagramsData from '@/data/all-64-enhanced-hexagrams.json'
+import hexagramsData from '@/data/complete-hexagrams.json'
 import { createSupabaseClient } from '@/lib/supabase'
 
 export default function DrawPage() {

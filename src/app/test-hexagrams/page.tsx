@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import hexagramsData from '@/data/all-64-enhanced-hexagrams.json'
+import hexagramsData from '@/data/complete-hexagrams.json'
 
 export default function HexagramsTest() {
   const [hexagrams, setHexagrams] = useState<any[]>([])

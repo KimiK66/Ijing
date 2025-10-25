@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { BookOpen, Info } from 'lucide-react'
 import { useApp } from '@/app/providers'
 import { getLocalizedText } from '@/lib/hexagrams'
-import hexagramsData from '@/data/all-64-enhanced-hexagrams.json'
+import { HexagramTranslation } from '@/types'
+import hexagramsData from '@/data/complete-hexagrams.json'
 
 export default function HexagramsPage() {
   const { language } = useApp()

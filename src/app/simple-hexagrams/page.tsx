@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { BookOpen, Info } from 'lucide-react'
 import { useApp } from '@/app/providers'
-import hexagramsData from '@/data/all-64-enhanced-hexagrams.json'
+import hexagramsData from '@/data/complete-hexagrams.json'
 
 export default function SimpleHexagramsPage() {
   const { language } = useApp()
