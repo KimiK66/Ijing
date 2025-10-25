@@ -14,37 +14,19 @@ export function AuthButton() {
     setIsLoading(true)
     try {
       const supabase = createSupabaseClient()
-      
-      console.log('Starting OAuth sign-in...')
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          skipBrowserRedirect: false
+          redirectTo: `${window.location.origin}/auth/callback`
         }
       })
       
       if (error) {
         console.error('Sign in error:', error)
-        alert(`Sign in error: ${error.message}`)
-        return
+        throw error
       }
-      
-      console.log('OAuth data:', data)
-      
-      // Force redirect if we get a URL
-      if (data?.url) {
-        console.log('Redirecting to:', data.url)
-        window.location.href = data.url
-      } else {
-        console.error('No URL received from Supabase')
-        alert('No redirect URL received from Supabase')
-      }
-      
     } catch (error) {
       console.error('Sign in error:', error)
-      alert(`Sign in failed: ${error.message}`)
     } finally {
       setIsLoading(false)
     }

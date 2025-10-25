@@ -1,13 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Default Supabase client
+// Client-side Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Client component Supabase client
-export const createSupabaseClient = () => createClient(supabaseUrl, supabaseAnonKey)
+export const createSupabaseClient = () => createClientComponentClient()
 
 // Database schema types (these will be generated from Supabase)
 export interface Database {
