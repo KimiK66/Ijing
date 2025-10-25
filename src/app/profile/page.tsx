@@ -24,18 +24,42 @@ export default function ProfilePage() {
 
   const supabase = createSupabaseClient()
 
+  // Check for auth callback parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const error = urlParams.get('error')
+    const message = urlParams.get('message')
+    
+    if (error) {
+      console.log('=== PROFILE PAGE ERROR ===')
+      console.log('Error:', error)
+      console.log('Message:', message)
+      alert(`Authentication error: ${error} - ${message}`)
+    }
+  }, [])
+
   // Load user data from Supabase
   useEffect(() => {
     const checkAuthAndLoadData = async () => {
+      console.log('=== PROFILE PAGE LOAD ===')
+      console.log('isAuthenticated:', isAuthenticated)
+      console.log('user:', user?.email || 'none')
+      
       // If we have authentication state, load data
       if (isAuthenticated && user) {
+        console.log('User is authenticated, loading data...')
         await loadUserData()
       } else {
+        console.log('Not authenticated, checking for session...')
         // If not authenticated, check if there's a session in the URL or storage
         try {
           const { data: { session }, error } = await supabase.auth.getSession()
+          console.log('Session check result:', session ? 'found' : 'not found')
+          console.log('Session error:', error)
+          
           if (session?.user && !isAuthenticated) {
-            console.log('Found session after redirect:', session.user)
+            console.log('Found session after redirect:', session.user.email)
+            console.log('Forcing page reload to update auth state...')
             // Force a page reload to update auth state
             window.location.reload()
             return
@@ -43,6 +67,7 @@ export default function ProfilePage() {
         } catch (error) {
           console.error('Error checking session:', error)
         }
+        console.log('No session found, setting loading to false')
         setIsLoading(false)
       }
     }

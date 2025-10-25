@@ -72,11 +72,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session)
+        console.log('=== AUTH STATE CHANGE ===')
+        console.log('Event:', event)
+        console.log('Session:', session ? 'present' : 'null')
+        console.log('User:', session?.user?.email || 'none')
+        
         if (session?.user) {
+          console.log('Setting authenticated state to true')
           setUser(session.user)
           setIsAuthenticated(true)
         } else {
+          console.log('Setting authenticated state to false')
           setUser(null)
           setIsAuthenticated(false)
         }

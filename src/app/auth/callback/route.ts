@@ -7,8 +7,11 @@ export async function GET(request: NextRequest) {
   const error = requestUrl.searchParams.get('error')
   const origin = requestUrl.origin
 
-  console.log('Auth callback - Code:', code ? 'present' : 'missing')
-  console.log('Auth callback - Error:', error)
+  console.log('=== AUTH CALLBACK START ===')
+  console.log('URL:', requestUrl.toString())
+  console.log('Code:', code ? 'present' : 'missing')
+  console.log('Error:', error)
+  console.log('Origin:', origin)
 
   if (error) {
     console.error('OAuth error:', error)
@@ -38,9 +41,31 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${origin}/profile?error=auth_callback_error&message=${encodeURIComponent(exchangeError.message)}`)
       }
       
-      console.log('Authentication successful:', data.user?.email)
-      // Successful authentication, redirect to profile
-      return NextResponse.redirect(`${origin}/profile`)
+      console.log('Authentication successful!')
+      console.log('User:', data.user?.email)
+      console.log('Session:', data.session ? 'created' : 'missing')
+      
+      // Set cookies for the session
+      const response = NextResponse.redirect(`${origin}/profile`)
+      
+      // Set session cookies
+      if (data.session) {
+        response.cookies.set('sb-access-token', data.session.access_token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 7 // 7 days
+        })
+        response.cookies.set('sb-refresh-token', data.session.refresh_token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 30 // 30 days
+        })
+      }
+      
+      console.log('=== AUTH CALLBACK SUCCESS - REDIRECTING TO PROFILE ===')
+      return response
     } catch (error) {
       console.error('Auth callback error:', error)
       return NextResponse.redirect(`${origin}/profile?error=auth_callback_error&message=${encodeURIComponent(String(error))}`)
