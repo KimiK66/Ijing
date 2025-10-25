@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { BookOpen, Shuffle, User, Globe, Info } from 'lucide-react'
 import { useApp } from './providers'
 import { ProfileButton } from '@/components/ProfileButton'
+import { SimpleProfileButton } from '@/components/SimpleProfileButton'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function HomePage() {
   return (
@@ -27,7 +29,9 @@ export default function HomePage() {
                 <span>What is I Ching?</span>
               </Link>
               <Globe className="w-5 h-5 text-gray-700" />
-              <ProfileButton />
+              <ErrorBoundary>
+                <SimpleProfileButton />
+              </ErrorBoundary>
             </div>
           </div>
         </div>

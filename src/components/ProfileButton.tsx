@@ -10,38 +10,50 @@ export function ProfileButton() {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleProfileClick = async () => {
+    console.log('Profile button clicked')
+    console.log('isAuthenticated:', isAuthenticated)
+    console.log('user:', user)
+    
     if (isAuthenticated && user) {
+      console.log('User is authenticated, redirecting to profile')
       // If authenticated, redirect to profile page
       window.location.href = '/profile'
       return
     }
 
     // If not authenticated, start OAuth flow
+    console.log('User not authenticated, starting OAuth flow')
     setIsLoading(true)
+    
     try {
-      console.log('Starting OAuth sign in...')
+      console.log('Creating Supabase client...')
       const supabase = createSupabaseClient()
       
-      // Use a simpler OAuth approach without PKCE
+      console.log('Starting OAuth sign in...')
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          skipBrowserRedirect: false
+          redirectTo: `${window.location.origin}/auth/callback`
         }
       })
+      
+      console.log('OAuth response:', { data, error })
       
       if (error) {
         console.error('Sign in error:', error)
         alert(`Sign in failed: ${error.message}`)
-        throw error
+        return
       }
       
       console.log('OAuth redirect URL:', data.url)
       
       // If we get a URL, redirect to it
       if (data.url) {
+        console.log('Redirecting to OAuth URL...')
         window.location.href = data.url
+      } else {
+        console.error('No redirect URL received')
+        alert('No redirect URL received from OAuth provider')
       }
     } catch (error) {
       console.error('Sign in error:', error)
