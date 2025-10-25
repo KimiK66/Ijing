@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Shuffle, ArrowLeft, BookOpen, Volume2, Lightbulb, Clock, Target, Heart, Star, Zap, Info } from 'lucide-react'
+import { Shuffle, ArrowLeft, BookOpen, Volume2, Lightbulb, Clock, Target, Heart, Star, Zap, Info, Save } from 'lucide-react'
 import { HexagramDisplay } from '@/components/HexagramDisplay'
 import { AudioPlayer } from '@/components/AudioPlayer'
 import { LanguageSelector } from '@/components/LanguageSelector'
@@ -10,6 +10,7 @@ import { useApp } from '@/app/providers'
 import { HexagramTranslation } from '@/types'
 import { getLocalizedText } from '@/lib/hexagrams'
 import hexagramsData from '@/data/all-64-enhanced-hexagrams.json'
+import { createSupabaseClient } from '@/lib/supabase'
 
 export default function DrawPage() {
   const { language } = useApp()
@@ -19,6 +20,11 @@ export default function DrawPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [drawHistory, setDrawHistory] = useState<HexagramTranslation[]>([])
   const [showDetailedInterpretation, setShowDetailedInterpretation] = useState(false)
+  const [isSavingReading, setIsSavingReading] = useState(false)
+  const [question, setQuestion] = useState('')
+  const [context, setContext] = useState('')
+
+  const supabase = createSupabaseClient()
 
   // Load hexagrams data
   useEffect(() => {
@@ -139,6 +145,47 @@ export default function DrawPage() {
     }
     
     return insights[language] || insights.en
+  }
+
+  const saveReading = async () => {
+    if (!drawnHexagram) return
+
+    try {
+      setIsSavingReading(true)
+      
+      // Get current session user
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) {
+        alert('Please sign in to save your reading')
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('user_readings')
+        .insert({
+          user_id: session.user.id,
+          hexagram_id: drawnHexagram.id,
+          question: question.trim() || null,
+          context: context.trim() || null
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error saving reading:', error)
+        alert('Failed to save reading. Please try again.')
+      } else {
+        console.log('Reading saved successfully:', data)
+        alert('Reading saved successfully! You can view it in your profile.')
+        setQuestion('')
+        setContext('')
+      }
+    } catch (error) {
+      console.error('Error saving reading:', error)
+      alert('Failed to save reading. Please try again.')
+    } finally {
+      setIsSavingReading(false)
+    }
   }
 
   if (isLoading) {
@@ -440,6 +487,78 @@ export default function DrawPage() {
                 </div>
               </div>
             )}
+
+            {/* Save Reading Form */}
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <Save className="w-6 h-6 text-green-600 mr-2" />
+                {language === 'zh' ? '保存这次抽取' :
+                 language === 'hi' ? 'इस ड्रॉ को सेव करें' :
+                 language === 'es' ? 'Guardar este Sorteo' :
+                 language === 'fr' ? 'Sauvegarder ce Tirage' :
+                 language === 'ja' ? 'このドローを保存' :
+                 'Save This Reading'}
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'zh' ? '问题（可选）' :
+                     language === 'hi' ? 'प्रश्न (वैकल्पिक)' :
+                     language === 'es' ? 'Pregunta (Opcional)' :
+                     language === 'fr' ? 'Question (Optionnel)' :
+                     language === 'ja' ? '質問（任意）' :
+                     'Question (Optional)'}
+                  </label>
+                  <input
+                    type="text"
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder={language === 'zh' ? '你问的是什么问题？' :
+                               language === 'hi' ? 'आपने क्या सवाल पूछा था?' :
+                               language === 'es' ? '¿Qué pregunta hiciste?' :
+                               language === 'fr' ? 'Quelle question avez-vous posée?' :
+                               language === 'ja' ? '何を質問しましたか？' :
+                               'What question did you ask?'}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'zh' ? '背景（可选）' :
+                     language === 'hi' ? 'संदर्भ (वैकल्पिक)' :
+                     language === 'es' ? 'Contexto (Opcional)' :
+                     language === 'fr' ? 'Contexte (Optionnel)' :
+                     language === 'ja' ? '背景（任意）' :
+                     'Context (Optional)'}
+                  </label>
+                  <textarea
+                    value={context}
+                    onChange={(e) => setContext(e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder={language === 'zh' ? '描述一下你当前的情况或背景...' :
+                               language === 'hi' ? 'अपनी वर्तमान स्थिति या पृष्ठभूमि का वर्णन करें...' :
+                               language === 'es' ? 'Describe tu situación actual o contexto...' :
+                               language === 'fr' ? 'Décrivez votre situation actuelle ou contexte...' :
+                               language === 'ja' ? '現在の状況や背景を説明してください...' :
+                               'Describe your current situation or context...'}
+                  />
+                </div>
+                <button
+                  onClick={saveReading}
+                  disabled={isSavingReading}
+                  className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  <Save className="w-5 h-5" />
+                  <span>
+                    {isSavingReading ? 
+                      (language === 'zh' ? '保存中...' : language === 'hi' ? 'सेव हो रहा है...' : language === 'es' ? 'Guardando...' : language === 'fr' ? 'Sauvegarde...' : language === 'ja' ? '保存中...' : 'Saving...') :
+                      (language === 'zh' ? '保存抽取' : language === 'hi' ? 'ड्रॉ सेव करें' : language === 'es' ? 'Guardar Sorteo' : language === 'fr' ? 'Sauvegarder Tirage' : language === 'ja' ? 'ドローを保存' : 'Save Reading')
+                    }
+                  </span>
+                </button>
+              </div>
+            </div>
 
             {/* Actions */}
             <div className="bg-white rounded-lg shadow-lg p-6">

@@ -50,41 +50,57 @@ export default function ProfilePage() {
   // Load user data from Supabase
   useEffect(() => {
     const loadUserData = async () => {
-      if (!isAuthenticated || !user) {
-        setIsLoading(false)
-        return
-      }
-
       try {
-        console.log('Loading user data for:', user.email)
-        setIsLoading(true)
+        console.log('=== PROFILE PAGE LOAD ===')
+        console.log('isAuthenticated:', isAuthenticated)
+        console.log('user:', user?.email || 'none')
         
-        // Load readings
-        const { data: readingsData, error: readingsError } = await supabase
-          .from('user_readings')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('timestamp', { ascending: false })
+        // Check for session first
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        console.log('Session check:', session ? 'found' : 'not found')
+        console.log('Session error:', sessionError)
+        
+        if (session?.user) {
+          console.log('Found session user:', session.user.email)
+          const currentUser = session.user
+          
+          // Load readings
+          console.log('Loading readings for user:', currentUser.id)
+          const { data: readingsData, error: readingsError } = await supabase
+            .from('user_readings')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .order('timestamp', { ascending: false })
 
-        if (readingsError) {
-          console.error('Error loading readings:', readingsError)
+          console.log('Readings query result:', readingsData)
+          console.log('Readings error:', readingsError)
+
+          if (readingsError) {
+            console.error('Error loading readings:', readingsError)
+          } else {
+            setReadings(readingsData || [])
+            console.log('Readings loaded:', readingsData?.length || 0)
+          }
+
+          // Load journals
+          console.log('Loading journals for user:', currentUser.id)
+          const { data: journalsData, error: journalsError } = await supabase
+            .from('user_journals')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false })
+
+          console.log('Journals query result:', journalsData)
+          console.log('Journals error:', journalsError)
+
+          if (journalsError) {
+            console.error('Error loading journals:', journalsError)
+          } else {
+            setJournals(journalsData || [])
+            console.log('Journals loaded:', journalsData?.length || 0)
+          }
         } else {
-          setReadings(readingsData || [])
-          console.log('Readings loaded:', readingsData?.length || 0)
-        }
-
-        // Load journals
-        const { data: journalsData, error: journalsError } = await supabase
-          .from('user_journals')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-
-        if (journalsError) {
-          console.error('Error loading journals:', journalsError)
-        } else {
-          setJournals(journalsData || [])
-          console.log('Journals loaded:', journalsData?.length || 0)
+          console.log('No session found, user not authenticated')
         }
       } catch (error) {
         console.error('Error loading user data:', error)
@@ -94,16 +110,23 @@ export default function ProfilePage() {
     }
     
     loadUserData()
-  }, [isAuthenticated, user])
+  }, [])
 
   const handleCreateJournal = async () => {
-    if (!user || !journalForm.title.trim() || !journalForm.content.trim()) return
+    if (!journalForm.title.trim() || !journalForm.content.trim()) return
 
     try {
+      // Get current session user
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) {
+        alert('Please sign in to create journal entries')
+        return
+      }
+
       const { data, error } = await supabase
         .from('user_journals')
         .insert({
-          user_id: user.id,
+          user_id: session.user.id,
           title: journalForm.title,
           content: journalForm.content,
           reading_id: journalForm.reading_id || null
