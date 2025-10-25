@@ -43,45 +43,41 @@ export function Providers({ children }: { children: React.ReactNode }) {
     localStorage.setItem('i-ching-language', language)
   }, [language])
 
-  // Initialize Supabase auth state - ULTRA SAFE MODE for public deployment
+  // Initialize Supabase auth state
   useEffect(() => {
     const supabase = createSupabaseClient()
     
-    console.log('Initializing Supabase auth state in ULTRA SAFE MODE...')
-    console.log('No auto-authentication - users must explicitly sign in')
-    console.log('All session management disabled for privacy')
+    console.log('Initializing Supabase auth state...')
     
-    // Force clear any existing sessions
-    const forceClearSessions = async () => {
+    // Get initial session
+    const getInitialSession = async () => {
       try {
-        // Clear Supabase session
-        await supabase.auth.signOut()
+        const { data: { session }, error } = await supabase.auth.getSession()
         
-        // Clear localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0] + '-auth-token')
-          localStorage.removeItem('supabase.auth.token')
-          // Clear any other potential auth storage
-          Object.keys(localStorage).forEach(key => {
-            if (key.includes('supabase') || key.includes('auth')) {
-              localStorage.removeItem(key)
-            }
-          })
+        if (error) {
+          console.error('Error getting session:', error)
+          return
         }
         
-        console.log('All sessions and storage cleared')
+        if (session?.user) {
+          console.log('Found existing session for user:', session.user.email)
+          setUser(session.user)
+          setIsAuthenticated(true)
+        } else {
+          console.log('No existing session found')
+          setUser(null)
+          setIsAuthenticated(false)
+        }
       } catch (error) {
-        console.log('Session clear completed:', error)
+        console.error('Error initializing auth:', error)
+        setUser(null)
+        setIsAuthenticated(false)
       }
     }
     
-    forceClearSessions()
+    getInitialSession()
     
-    // Set initial state to NOT authenticated
-    setUser(null)
-    setIsAuthenticated(false)
-    
-    // Listen for auth changes (only when user explicitly signs in)
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('=== AUTH STATE CHANGE ===')
@@ -89,14 +85,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
         console.log('Session:', session ? 'present' : 'null')
         console.log('User:', session?.user?.email || 'none')
         
-        if (session?.user) {
-          console.log('User explicitly signed in:', session.user.email)
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('User signed in:', session.user.email)
           setUser(session.user)
           setIsAuthenticated(true)
-        } else {
-          console.log('User signed out or no session')
+        } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out')
           setUser(null)
           setIsAuthenticated(false)
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          console.log('Token refreshed for user:', session.user.email)
+          setUser(session.user)
+          setIsAuthenticated(true)
         }
       }
     )

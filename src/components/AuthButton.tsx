@@ -13,7 +13,7 @@ export function AuthButton() {
   const handleSignIn = async () => {
     setIsLoading(true)
     try {
-      console.log('Starting OAuth sign in...')
+      console.log('Starting Google OAuth sign in...')
       const supabase = createSupabaseClient()
       
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -22,7 +22,8 @@ export function AuthButton() {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'consent',
+            scope: 'openid email profile'
           }
         }
       })
@@ -30,14 +31,17 @@ export function AuthButton() {
       if (error) {
         console.error('Sign in error:', error)
         alert(`Sign in failed: ${error.message}`)
-        throw error
+        return
       }
       
       console.log('OAuth redirect URL:', data.url)
       
-      // If we get a URL, redirect to it
+      // Redirect to Google OAuth
       if (data.url) {
         window.location.href = data.url
+      } else {
+        console.error('No redirect URL received')
+        alert('Authentication failed: No redirect URL received')
       }
     } catch (error) {
       console.error('Sign in error:', error)

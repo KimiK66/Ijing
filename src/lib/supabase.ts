@@ -3,15 +3,15 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// ULTRA SAFE MODE - No session management at all
+// Production-ready configuration for OAuth
 const supabaseConfig = {
   auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-    detectSessionInUrl: false,
-    flowType: 'implicit' as const,
-    storage: undefined, // Disable storage completely
-    storageKey: undefined // No storage key
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce' as const,
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    storageKey: 'supabase.auth.token'
   }
 }
 
