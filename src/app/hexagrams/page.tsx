@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { BookOpen, Info } from 'lucide-react'
+import { LanguageSelector } from '@/components/LanguageSelector'
 import { useApp } from '@/app/providers'
 import { getLocalizedText } from '@/lib/hexagrams'
 import { HexagramTranslation } from '@/types'
