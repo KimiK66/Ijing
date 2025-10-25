@@ -14,15 +14,8 @@ export function ProfileButton() {
     console.log('isAuthenticated:', isAuthenticated)
     console.log('user:', user)
     
-    if (isAuthenticated && user) {
-      console.log('User is authenticated, redirecting to profile')
-      // If authenticated, redirect to profile page
-      window.location.href = '/profile'
-      return
-    }
-
-    // If not authenticated, start OAuth flow
-    console.log('User not authenticated, starting OAuth flow')
+    // Always start OAuth flow first - let users choose their account
+    console.log('Starting OAuth flow for profile access')
     setIsLoading(true)
     
     try {
@@ -126,7 +119,7 @@ export function ProfileButton() {
       className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors disabled:opacity-50"
     >
       <User className="w-5 h-5" />
-      <span>{isLoading ? 'Signing in...' : 'Profile'}</span>
+          <span>{isLoading ? 'Signing in...' : 'Sign In'}</span>
     </button>
   )
 }
