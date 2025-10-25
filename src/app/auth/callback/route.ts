@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         auth: {
-          flowType: 'pkce',
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
     try {
       console.log('Attempting to exchange code for session...')
       
-      // Use the proper method for PKCE code exchange
+      // Use the proper method for code exchange (without PKCE)
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
       
       if (error) {

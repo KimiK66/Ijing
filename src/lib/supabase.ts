@@ -3,20 +3,18 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Client-side Supabase client with PKCE
+// Client-side Supabase client without PKCE (simpler approach)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    flowType: 'pkce',
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
   }
 })
 
-// Client component Supabase client with PKCE
+// Client component Supabase client without PKCE
 export const createSupabaseClient = () => createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    flowType: 'pkce',
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
