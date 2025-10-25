@@ -15,37 +15,17 @@ export function AuthButton() {
     try {
       const supabase = createSupabaseClient()
       
-      console.log('Starting OAuth sign-in...')
-      console.log('Current URL:', window.location.origin)
-      console.log('Redirect URL:', `${window.location.origin}/auth/callback`)
-      console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
-      
-      // Use the newer signInWithOAuth method with proper PKCE handling
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          skipBrowserRedirect: false
+          redirectTo: `${window.location.origin}/auth/callback`
         }
       })
       
       if (error) {
         console.error('Sign in error:', error)
         alert(`Sign in error: ${error.message}`)
-        throw error
       }
-      
-      console.log('OAuth redirect initiated:', data)
-      
-      // If we get here, the redirect should happen automatically
-      if (data?.url) {
-        console.log('Redirecting to:', data.url)
-        window.location.href = data.url
-      } else {
-        console.error('No redirect URL received from Supabase')
-        alert('No redirect URL received from Supabase')
-      }
-      
     } catch (error) {
       console.error('Sign in error:', error)
       alert(`Sign in failed: ${error.message}`)
