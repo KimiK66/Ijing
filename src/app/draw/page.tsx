@@ -9,6 +9,7 @@ import { LanguageSelector } from '@/components/LanguageSelector'
 import { useApp } from '@/app/providers'
 import { HexagramTranslation } from '@/types'
 import { getLocalizedText } from '@/lib/hexagrams'
+import hexagramsData from '@/data/all-64-enhanced-hexagrams.json'
 
 export default function DrawPage() {
   const { language } = useApp()
@@ -23,13 +24,8 @@ export default function DrawPage() {
   useEffect(() => {
     const loadHexagrams = async () => {
       try {
-        const response = await fetch('/api/hexagrams')
-        const result = await response.json()
-        if (result.success) {
-          setHexagrams(result.data)
-        } else {
-          console.error('Failed to load hexagrams:', result.error)
-        }
+        // Use the imported hexagrams data directly
+        setHexagrams(hexagramsData as HexagramTranslation[])
       } catch (error) {
         console.error('Error loading hexagrams:', error)
       } finally {
