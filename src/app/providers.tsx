@@ -43,33 +43,34 @@ export function Providers({ children }: { children: React.ReactNode }) {
     localStorage.setItem('i-ching-language', language)
   }, [language])
 
-  // Initialize Supabase auth state
+  // Initialize Supabase auth state - SAFE MODE for public deployment
   useEffect(() => {
     const supabase = createSupabaseClient()
     
-    console.log('Initializing Supabase auth state...')
+    console.log('Initializing Supabase auth state in SAFE MODE...')
+    console.log('No auto-authentication - users must explicitly sign in')
     
-    // Get initial session
-    const getInitialSession = async () => {
+    // Clear any existing session for safety
+    const clearExistingSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-        console.log('Initial session:', session)
+        const { error } = await supabase.auth.signOut()
         if (error) {
-          console.error('Session error:', error)
-        }
-        if (session?.user) {
-          console.log('User found:', session.user)
-          setUser(session.user)
-          setIsAuthenticated(true)
+          console.log('No existing session to clear:', error.message)
+        } else {
+          console.log('Cleared any existing session')
         }
       } catch (error) {
-        console.error('Error getting session:', error)
+        console.log('Session clear error (expected):', error)
       }
     }
     
-    getInitialSession()
-
-    // Listen for auth changes
+    clearExistingSession()
+    
+    // Set initial state to NOT authenticated
+    setUser(null)
+    setIsAuthenticated(false)
+    
+    // Listen for auth changes (only when user explicitly signs in)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('=== AUTH STATE CHANGE ===')
@@ -78,11 +79,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         console.log('User:', session?.user?.email || 'none')
         
         if (session?.user) {
-          console.log('Setting authenticated state to true')
+          console.log('User explicitly signed in:', session.user.email)
           setUser(session.user)
           setIsAuthenticated(true)
         } else {
-          console.log('Setting authenticated state to false')
+          console.log('User signed out or no session')
           setUser(null)
           setIsAuthenticated(false)
         }

@@ -52,7 +52,7 @@ export function ProfileButton() {
   }
 
   const handleProfileClick = async () => {
-    console.log('Profile button clicked')
+    console.log('Profile/Sign In button clicked')
     console.log('isAuthenticated:', isAuthenticated)
     console.log('user:', user)
     
@@ -64,6 +64,7 @@ export function ProfileButton() {
     }
 
     // If not authenticated, start OAuth flow
+    console.log('User not authenticated, starting Google OAuth flow')
     await handleSignIn()
   }
 
@@ -130,7 +131,7 @@ export function ProfileButton() {
       className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors disabled:opacity-50"
     >
       <User className="w-5 h-5" />
-          <span>{isLoading ? 'Signing in...' : 'Profile'}</span>
+          <span>{isLoading ? 'Signing in...' : 'Sign In'}</span>
     </button>
   )
 }
