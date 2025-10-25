@@ -78,34 +78,49 @@ export default function ProfilePage() {
   const loadUserData = async () => {
     try {
       setIsLoading(true)
+      console.log('=== LOADING USER DATA ===')
+      console.log('User ID:', user?.id)
       
       // Load readings
+      console.log('Loading readings...')
       const { data: readingsData, error: readingsError } = await supabase
         .from('user_readings')
         .select('*')
         .eq('user_id', user?.id)
         .order('timestamp', { ascending: false })
 
+      console.log('Readings query result:', readingsData)
+      console.log('Readings error:', readingsError)
+
       if (readingsError) {
         console.error('Error loading readings:', readingsError)
+        alert(`Error loading readings: ${readingsError.message}`)
       } else {
         setReadings(readingsData || [])
+        console.log('Readings loaded:', readingsData?.length || 0)
       }
 
       // Load journals
+      console.log('Loading journals...')
       const { data: journalsData, error: journalsError } = await supabase
         .from('user_journals')
         .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false })
 
+      console.log('Journals query result:', journalsData)
+      console.log('Journals error:', journalsError)
+
       if (journalsError) {
         console.error('Error loading journals:', journalsError)
+        alert(`Error loading journals: ${journalsError.message}`)
       } else {
         setJournals(journalsData || [])
+        console.log('Journals loaded:', journalsData?.length || 0)
       }
     } catch (error) {
       console.error('Error loading user data:', error)
+      alert(`Error loading user data: ${error}`)
     } finally {
       setIsLoading(false)
     }
@@ -294,6 +309,34 @@ export default function ProfilePage() {
             <div className="text-gray-600">Days Active</div>
           </div>
         </div>
+
+        {/* Debug Info for Authenticated Users */}
+        {isAuthenticated && user && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+            <h3 className="text-lg font-semibold text-yellow-900 mb-2">Debug Information</h3>
+            <div className="text-sm text-yellow-800 space-y-1">
+              <p><strong>User ID:</strong> {user.id}</p>
+              <p><strong>Email:</strong> {user.email}</p>
+              <p><strong>Authentication Status:</strong> {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}</p>
+              <p><strong>Readings Count:</strong> {readings.length}</p>
+              <p><strong>Journals Count:</strong> {journals.length}</p>
+            </div>
+            <button
+              onClick={() => {
+                const testJournal = {
+                  title: 'Test Journal Entry',
+                  content: 'This is a test journal entry to verify database connectivity.',
+                  reading_id: undefined
+                }
+                setJournalForm(testJournal)
+                setIsCreatingJournal(true)
+              }}
+              className="mt-2 px-3 py-1 bg-yellow-600 text-white text-sm rounded hover:bg-yellow-700"
+            >
+              Create Test Journal Entry
+            </button>
+          </div>
+        )}
 
         {/* Recent Readings */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
