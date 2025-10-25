@@ -13,20 +13,35 @@ export function AuthButton() {
   const handleSignIn = async () => {
     setIsLoading(true)
     try {
+      console.log('Starting OAuth sign in...')
       const supabase = createSupabaseClient()
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
         }
       })
       
       if (error) {
         console.error('Sign in error:', error)
+        alert(`Sign in failed: ${error.message}`)
         throw error
+      }
+      
+      console.log('OAuth redirect URL:', data.url)
+      
+      // If we get a URL, redirect to it
+      if (data.url) {
+        window.location.href = data.url
       }
     } catch (error) {
       console.error('Sign in error:', error)
+      alert(`Sign in failed: ${error}`)
     } finally {
       setIsLoading(false)
     }
@@ -35,18 +50,22 @@ export function AuthButton() {
   const handleSignOut = async () => {
     setIsLoading(true)
     try {
+      console.log('Signing out...')
       const supabase = createSupabaseClient()
       const { error } = await supabase.auth.signOut()
       
       if (error) {
         console.error('Sign out error:', error)
+        alert(`Sign out failed: ${error.message}`)
         throw error
       }
       
+      console.log('Sign out successful')
       setUser(null)
       setIsAuthenticated(false)
     } catch (error) {
       console.error('Sign out error:', error)
+      alert(`Sign out failed: ${error}`)
     } finally {
       setIsLoading(false)
     }

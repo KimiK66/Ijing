@@ -1,26 +1,23 @@
 import { createClient } from '@supabase/supabase-js'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Client-side Supabase client with PKCE enabled
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Unified Supabase client configuration
+const supabaseConfig = {
   auth: {
-    flowType: 'pkce'
+    flowType: 'pkce' as const,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
   }
-})
+}
 
-// Client component Supabase client with PKCE
-export const createSupabaseClient = () => createClientComponentClient({
-  supabaseUrl,
-  supabaseKey: supabaseAnonKey,
-  supabaseOptions: {
-    auth: {
-      flowType: 'pkce'
-    }
-  }
-})
+// Client-side Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, supabaseConfig)
+
+// Client component Supabase client (same configuration)
+export const createSupabaseClient = () => createClient(supabaseUrl, supabaseAnonKey, supabaseConfig)
 
 // Database schema types (these will be generated from Supabase)
 export interface Database {
