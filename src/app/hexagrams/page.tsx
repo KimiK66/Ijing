@@ -127,7 +127,7 @@ export default function HexagramsPage() {
                       {name}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      {hexagram.chinese_name || hexagram.chineseName}
+                      {hexagram.chineseName || hexagram.chinese_name}
                     </p>
                   </div>
 
@@ -152,7 +152,7 @@ export default function HexagramsPage() {
                   {/* Trigrams */}
                   <div className="text-center mb-4">
                     <div className="text-sm text-gray-600">
-                      {hexagram.lower_trigram || hexagram.lowerTrigram} {hexagram.upper_trigram || hexagram.upperTrigram}
+                      {hexagram.lowerTrigram || hexagram.lower_trigram} {hexagram.upperTrigram || hexagram.upper_trigram}
                     </div>
                   </div>
 
