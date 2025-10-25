@@ -31,7 +31,7 @@ export default function HomePage() {
               </Link>
               <Globe className="w-5 h-5 text-gray-700" />
               <ErrorBoundary>
-                <TestButton />
+                <ProfileButton />
               </ErrorBoundary>
             </div>
           </div>
