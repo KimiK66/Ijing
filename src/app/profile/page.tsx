@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, BookOpen, Heart, Calendar, User, Plus, Edit, Trash2, Save, X } from 'lucide-react'
 import { LanguageSelector } from '@/components/LanguageSelector'
-import { AuthButton } from '@/components/AuthButton'
+import { ProfileButton } from '@/components/ProfileButton'
 import { useApp } from '@/app/providers'
 import { UserReading, UserJournal, JournalFormData } from '@/types'
 import { createSupabaseClient } from '@/lib/supabase'
@@ -26,11 +26,28 @@ export default function ProfilePage() {
 
   // Load user data from Supabase
   useEffect(() => {
-    if (isAuthenticated && user) {
-      loadUserData()
-    } else {
-      setIsLoading(false)
+    const checkAuthAndLoadData = async () => {
+      // If we have authentication state, load data
+      if (isAuthenticated && user) {
+        await loadUserData()
+      } else {
+        // If not authenticated, check if there's a session in the URL or storage
+        try {
+          const { data: { session }, error } = await supabase.auth.getSession()
+          if (session?.user && !isAuthenticated) {
+            console.log('Found session after redirect:', session.user)
+            // Force a page reload to update auth state
+            window.location.reload()
+            return
+          }
+        } catch (error) {
+          console.error('Error checking session:', error)
+        }
+        setIsLoading(false)
+      }
     }
+    
+    checkAuthAndLoadData()
   }, [isAuthenticated, user])
 
   const loadUserData = async () => {
@@ -187,7 +204,7 @@ export default function ProfilePage() {
               <h1 className="text-xl font-bold text-gray-900">I Ching Divination</h1>
             </Link>
             <div className="flex items-center space-x-4">
-              <AuthButton />
+              <ProfileButton />
               <LanguageSelector />
             </div>
           </div>
@@ -222,7 +239,7 @@ export default function ProfilePage() {
                 <p className="text-blue-700 mb-4">
                   Create an account to save your readings, write personal journals, and track your I Ching journey.
                 </p>
-                <AuthButton />
+                <ProfileButton />
               </div>
             </div>
           </div>
@@ -428,7 +445,7 @@ export default function ProfilePage() {
                   Create First Entry
                 </button>
               ) : (
-                <AuthButton />
+                <ProfileButton />
               )}
             </div>
           )}
