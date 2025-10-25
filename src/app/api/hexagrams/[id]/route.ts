@@ -58,11 +58,11 @@ export async function GET(request: NextRequest, { params }: HexagramParams) {
 }
 
 async function getFallbackData(hexagramId: string) {
-  // Fallback to JSON data
+  // Use the complete-hexagrams.json file instead of the old hexagrams.json
   const fs = await import('fs')
   const path = await import('path')
 
-  const filePath = path.join(process.cwd(), 'src', 'data', 'hexagrams.json')
+  const filePath = path.join(process.cwd(), 'src', 'data', 'complete-hexagrams.json')
   const fileContents = fs.readFileSync(filePath, 'utf8')
   const hexagrams: HexagramTranslation[] = JSON.parse(fileContents)
   
