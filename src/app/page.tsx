@@ -4,8 +4,6 @@ import Link from 'next/link'
 import { BookOpen, Shuffle, User, Globe, Info } from 'lucide-react'
 import { useApp } from './providers'
 import { ProfileButton } from '@/components/ProfileButton'
-import { SimpleProfileButton } from '@/components/SimpleProfileButton'
-import { TestButton } from '@/components/TestButton'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function HomePage() {
