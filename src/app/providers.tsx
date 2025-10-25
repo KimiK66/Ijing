@@ -47,12 +47,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const supabase = createSupabaseClient()
     
+    console.log('Initializing Supabase auth state...')
+    
     // Get initial session
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        setUser(session.user)
-        setIsAuthenticated(true)
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        console.log('Initial session:', session)
+        if (error) {
+          console.error('Session error:', error)
+        }
+        if (session?.user) {
+          console.log('User found:', session.user)
+          setUser(session.user)
+          setIsAuthenticated(true)
+        }
+      } catch (error) {
+        console.error('Error getting session:', error)
       }
     }
     
@@ -61,6 +72,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session)
         if (session?.user) {
           setUser(session.user)
           setIsAuthenticated(true)

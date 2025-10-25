@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import { BookOpen, Shuffle, User, Globe, Info } from 'lucide-react'
 import { useApp } from './providers'
+import { AuthButton } from '@/components/AuthButton'
 
 export default function HomePage() {
   return (
@@ -31,6 +34,7 @@ export default function HomePage() {
                 <span>Profile</span>
               </Link>
               <Globe className="w-5 h-5 text-gray-700" />
+              <AuthButton />
             </div>
           </div>
         </div>

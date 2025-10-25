@@ -15,6 +15,8 @@ export function AuthButton() {
     try {
       const supabase = createSupabaseClient()
       
+      console.log('Starting OAuth sign-in...')
+      
       // Use the newer signInWithOAuth method with proper PKCE handling
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -26,10 +28,15 @@ export function AuthButton() {
       
       if (error) {
         console.error('Sign in error:', error)
+        alert(`Sign in error: ${error.message}`)
         throw error
       }
+      
+      console.log('OAuth redirect initiated:', data)
+      
     } catch (error) {
       console.error('Sign in error:', error)
+      alert(`Sign in failed: ${error.message}`)
     } finally {
       setIsLoading(false)
     }
