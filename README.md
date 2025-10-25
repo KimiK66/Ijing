@@ -2,7 +2,7 @@
 
 A modern web application for exploring the ancient wisdom of the I Ching (Book of Changes) through interactive divination, personalized readings, and multi-language support.
 
-**Live Demo:** https://ijing.vercel.app
+**Live Demo:** https://ijing.vercel.app - Clean codebase deployed $(date)
 
 ## Features
 
