@@ -131,7 +131,7 @@ export function ProfileButton() {
       className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors disabled:opacity-50"
     >
       <User className="w-5 h-5" />
-          <span>{isLoading ? 'Signing in...' : 'Sign In'}</span>
+          <span>{isLoading ? 'Signing in...' : 'SIGN IN NOW'}</span>
     </button>
   )
 }
