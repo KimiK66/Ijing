@@ -19,6 +19,7 @@ export default function HexagramsPage() {
     const loadHexagrams = async () => {
       try {
         console.log('Loading hexagrams data...')
+        console.log('Data source: complete-hexagrams.json')
         console.log('Data:', hexagramsData)
         // Use the imported hexagrams data directly
         setHexagrams(hexagramsData as HexagramTranslation[])
