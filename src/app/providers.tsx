@@ -43,15 +43,41 @@ export function Providers({ children }: { children: React.ReactNode }) {
     localStorage.setItem('i-ching-language', language)
   }, [language])
 
-  // Initialize Supabase auth state - SAFE MODE for public deployment
+  // Initialize Supabase auth state - ULTRA SAFE MODE for public deployment
   useEffect(() => {
     const supabase = createSupabaseClient()
     
-    console.log('Initializing Supabase auth state in SAFE MODE...')
+    console.log('Initializing Supabase auth state in ULTRA SAFE MODE...')
     console.log('No auto-authentication - users must explicitly sign in')
-    console.log('Session persistence disabled for privacy')
+    console.log('All session management disabled for privacy')
     
-    // Set initial state to NOT authenticated (no session persistence)
+    // Force clear any existing sessions
+    const forceClearSessions = async () => {
+      try {
+        // Clear Supabase session
+        await supabase.auth.signOut()
+        
+        // Clear localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0] + '-auth-token')
+          localStorage.removeItem('supabase.auth.token')
+          // Clear any other potential auth storage
+          Object.keys(localStorage).forEach(key => {
+            if (key.includes('supabase') || key.includes('auth')) {
+              localStorage.removeItem(key)
+            }
+          })
+        }
+        
+        console.log('All sessions and storage cleared')
+      } catch (error) {
+        console.log('Session clear completed:', error)
+      }
+    }
+    
+    forceClearSessions()
+    
+    // Set initial state to NOT authenticated
     setUser(null)
     setIsAuthenticated(false)
     
