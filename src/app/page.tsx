@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { BookOpen, Shuffle, User, Globe, Info } from 'lucide-react'
 import { useApp } from './providers'
-import { AuthButton } from '@/components/AuthButton'
+import { ProfileButton } from '@/components/ProfileButton'
 
 export default function HomePage() {
   return (
@@ -26,15 +26,8 @@ export default function HomePage() {
                 <Info className="w-5 h-5" />
                 <span>What is I Ching?</span>
               </Link>
-              <Link
-                href="/profile"
-                className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors"
-              >
-                <User className="w-5 h-5" />
-                <span>Profile</span>
-              </Link>
               <Globe className="w-5 h-5 text-gray-700" />
-              <AuthButton />
+              <ProfileButton />
             </div>
           </div>
         </div>
