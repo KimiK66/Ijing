@@ -10,9 +10,9 @@ export function SimpleProfileButton() {
     console.log('Simple Profile button clicked')
     setIsLoading(true)
     
-    // Simple redirect to profile page for testing
+    // Simple redirect to simple profile page for testing
     setTimeout(() => {
-      window.location.href = '/profile'
+      window.location.href = '/profile/simple'
     }, 1000)
   }
 
