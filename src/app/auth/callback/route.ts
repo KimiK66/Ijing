@@ -7,6 +7,8 @@ export async function GET(request: NextRequest) {
   const next = requestUrl.searchParams.get('next') ?? '/profile'
   const origin = requestUrl.origin
 
+  console.log('Auth callback received:', { code: !!code, origin, next })
+
   if (code) {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,12 +17,15 @@ export async function GET(request: NextRequest) {
         auth: {
           flowType: 'pkce',
           autoRefreshToken: true,
-          persistSession: true
+          persistSession: true,
+          detectSessionInUrl: true
         }
       }
     )
     
     try {
+      console.log('Attempting to exchange code for session...')
+      
       // Use the proper method for PKCE code exchange
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
       
@@ -28,6 +33,8 @@ export async function GET(request: NextRequest) {
         console.error('Auth callback error:', error)
         return NextResponse.redirect(`${origin}/?error=auth_callback_error&message=${encodeURIComponent(error.message)}`)
       }
+      
+      console.log('Authentication successful:', !!data.session)
       
       // Successful authentication, redirect to intended page
       return NextResponse.redirect(`${origin}${next}`)
@@ -37,6 +44,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  console.log('No code provided, redirecting to home')
   // No code provided, redirect to home
   return NextResponse.redirect(`${origin}/`)
 }
