@@ -49,24 +49,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     
     console.log('Initializing Supabase auth state in SAFE MODE...')
     console.log('No auto-authentication - users must explicitly sign in')
+    console.log('Session persistence disabled for privacy')
     
-    // Clear any existing session for safety
-    const clearExistingSession = async () => {
-      try {
-        const { error } = await supabase.auth.signOut()
-        if (error) {
-          console.log('No existing session to clear:', error.message)
-        } else {
-          console.log('Cleared any existing session')
-        }
-      } catch (error) {
-        console.log('Session clear error (expected):', error)
-      }
-    }
-    
-    clearExistingSession()
-    
-    // Set initial state to NOT authenticated
+    // Set initial state to NOT authenticated (no session persistence)
     setUser(null)
     setIsAuthenticated(false)
     
