@@ -76,7 +76,7 @@ export default function DrawPage() {
     }
     
     // Fallback guidance if not in database yet
-    const guidance = {
+    const guidance: Record<string, any> = {
       en: {
         timing: "This hexagram represents the current moment in your life's journey.",
         application: "Consider how the themes of this hexagram apply to your current challenges.",
@@ -106,7 +106,7 @@ export default function DrawPage() {
     }
     
     // Fallback insights if not in database yet
-    const insights = {
+    const insights: Record<string, any> = {
       en: {
         lifeArea: "This hexagram relates to your personal development.",
         emotionalGuidance: "Consider your emotional state.",
@@ -397,7 +397,7 @@ export default function DrawPage() {
                            (language === 'zh' ? '行动' : language === 'hi' ? 'कार्य' : language === 'es' ? 'Acción' : language === 'fr' ? 'Action' : language === 'ja' ? '行動' : 'Action')}
                         </h3>
                       </div>
-                      <p className="text-gray-700 leading-relaxed">{value}</p>
+                      <p className="text-gray-700 leading-relaxed">{String(value)}</p>
                     </div>
                   ))}
                 </div>
@@ -430,7 +430,7 @@ export default function DrawPage() {
                          (language === 'zh' ? '精神信息' : language === 'hi' ? 'आध्यात्मिक संदेश' : language === 'es' ? 'Mensaje Espiritual' : language === 'fr' ? 'Message Spirituel' : language === 'ja' ? 'スピリチュアルメッセージ' : 'Spiritual Message')}
                       </h3>
                     </div>
-                    <p className="text-gray-700 text-sm leading-relaxed">{value}</p>
+                    <p className="text-gray-700 text-sm leading-relaxed">{String(value)}</p>
                   </div>
                 ))}
               </div>
