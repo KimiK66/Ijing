@@ -3,8 +3,6 @@
 import Link from 'next/link'
 import { BookOpen, Shuffle, User, Globe, Info } from 'lucide-react'
 import { useApp } from './providers'
-import { ProfileButton } from '@/components/ProfileButton'
-import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function HomePage() {
   return (
@@ -28,9 +26,6 @@ export default function HomePage() {
                 <span>What is I Ching?</span>
               </Link>
               <Globe className="w-5 h-5 text-gray-700" />
-              <ErrorBoundary>
-                <ProfileButton />
-              </ErrorBoundary>
             </div>
           </div>
         </div>
@@ -119,9 +114,9 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Personal Journals</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Interactive Divination</h3>
               <p className="text-gray-600">
-                Save your readings and create personal journals to reflect on your journey.
+                Explore ancient wisdom through interactive divination and personalized readings.
               </p>
             </div>
             <div className="text-center">
