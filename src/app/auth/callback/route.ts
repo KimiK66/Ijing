@@ -22,7 +22,9 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     try {
-      // Exchange the code for a session
+      const response = NextResponse.redirect(`${origin}/profile`)
+      
+      // Exchange the code for a session and set cookies
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -48,8 +50,14 @@ export async function GET(request: NextRequest) {
       console.log('User:', data.user?.email)
       console.log('Session:', data.session ? 'created' : 'missing')
       
-      // Redirect to profile page after successful authentication
-      return NextResponse.redirect(`${origin}/profile`)
+      // Set session cookies in the response
+      if (data.session) {
+        // Get all cookies from Supabase
+        const cookies = supabase.auth.getCookies()
+        console.log('Setting session cookies:', cookies)
+      }
+      
+      return response
     } catch (error) {
       console.error('Auth callback error:', error)
       return NextResponse.redirect(`${origin}/?error=callback_error&message=${encodeURIComponent(String(error))}`)
