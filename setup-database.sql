@@ -19,6 +19,8 @@ CREATE TABLE hexagrams (
   lines JSONB NOT NULL,
   interpretation JSONB NOT NULL,
   keywords JSONB NOT NULL,
+  detailed_guidance JSONB,
+  personal_insights JSONB,
   element TEXT NOT NULL CHECK (element IN ('Metal', 'Earth', 'Water', 'Wood', 'Fire')),
   season TEXT NOT NULL CHECK (season IN ('Spring', 'Summer', 'Autumn', 'Winter')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -126,6 +128,8 @@ GRANT SELECT ON hexagram_lookup TO authenticated;
 
 -- Add comments for documentation
 COMMENT ON TABLE hexagrams IS 'Contains all 64 I Ching hexagrams with multi-language support';
+COMMENT ON COLUMN hexagrams.detailed_guidance IS 'Detailed guidance sections: timing, application, reflection, action';
+COMMENT ON COLUMN hexagrams.personal_insights IS 'Personal insights: lifeArea, emotionalGuidance, practicalAdvice, spiritualMessage';
 COMMENT ON TABLE user_readings IS 'Stores user divination readings and questions';
 COMMENT ON TABLE user_journals IS 'Stores user personal journals and reflections';
 COMMENT ON VIEW hexagram_lookup IS 'Simplified view for hexagram lookups';

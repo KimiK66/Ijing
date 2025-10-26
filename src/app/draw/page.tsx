@@ -65,42 +65,29 @@ export default function DrawPage() {
   }
 
   const getDetailedGuidance = (hexagram: HexagramTranslation) => {
+    // Get detailed guidance from database if available
+    if (hexagram.detailed_guidance) {
+      return hexagram.detailed_guidance[language] || hexagram.detailed_guidance.en || {
+        timing: "The timing of this hexagram aligns with your current circumstances.",
+        application: "Consider how this hexagram applies to your situation.",
+        reflection: "Take time to contemplate the message of this hexagram.",
+        action: "Based on this hexagram's guidance, consider your next steps."
+      }
+    }
+    
+    // Fallback guidance if not in database yet
     const guidance = {
       en: {
-        timing: "This hexagram represents the current moment in your life's journey. The timing suggests that the energies and circumstances are aligned for this particular guidance to be most relevant to your situation. Consider how this moment in time relates to your current challenges, opportunities, and the natural flow of change in your life.",
-        application: "Consider how the themes of this hexagram apply to your current challenges or opportunities. Reflect on the symbolic meaning and how it might guide your decisions and actions. This hexagram speaks to the deeper patterns of your life and offers wisdom for navigating your current circumstances with grace and understanding.",
-        reflection: "Take time to meditate on this hexagram's message. The I Ching speaks to the deeper patterns of change and transformation in your life. This is an opportunity for deep self-reflection and understanding of the cosmic forces at work in your personal journey. Allow the wisdom to penetrate your consciousness and guide your inner knowing.",
-        action: "Based on this hexagram's guidance, consider what actions or changes might be beneficial. Remember that the I Ching offers wisdom, not rigid prescriptions. The guidance is meant to inspire thoughtful action rather than impulsive decisions. Consider both immediate steps and long-term directions that align with the hexagram's wisdom."
+        timing: "This hexagram represents the current moment in your life's journey.",
+        application: "Consider how the themes of this hexagram apply to your current challenges.",
+        reflection: "Take time to meditate on this hexagram's message.",
+        action: "Based on this hexagram's guidance, consider what actions might be beneficial."
       },
       zh: {
-        timing: "这个卦象代表你人生旅程中的当前时刻。时机表明能量和环境已经对齐，这个特定的指导对你的情况最为相关。考虑这个时刻如何与你当前的挑战、机遇以及生活中变化的自然流动相关。",
-        application: "考虑这个卦象的主题如何适用于你当前的挑战或机遇。反思象征意义以及它如何指导你的决定和行动。这个卦象与你生活的更深层模式对话，并为优雅和理解地驾驭你当前的环境提供智慧。",
-        reflection: "花时间冥想这个卦象的信息。易经与你生活中变化和转化的更深层模式对话。这是深度自我反思和理解宇宙力量在你个人旅程中发挥作用的机会。让智慧渗透你的意识并指导你的内在认知。",
-        action: "基于这个卦象的指导，考虑什么行动或变化可能有益。记住易经提供智慧，而不是僵化的处方。指导旨在激发深思熟虑的行动，而不是冲动的决定。考虑与卦象智慧一致的即时步骤和长期方向。"
-      },
-      hi: {
-        timing: "यह हेक्साग्राम आपके जीवन की यात्रा में वर्तमान क्षण का प्रतिनिधित्व करता है। समय बताता है कि ऊर्जाएं और परिस्थितियां इस विशेष मार्गदर्शन के लिए संरेखित हैं। विचार करें कि यह समय आपकी वर्तमान चुनौतियों, अवसरों और आपके जीवन में परिवर्तन के प्राकृतिक प्रवाह से कैसे संबंधित है।",
-        application: "विचार करें कि यह हेक्साग्राम के विषय आपकी वर्तमान चुनौतियों या अवसरों पर कैसे लागू होते हैं। प्रतीकात्मक अर्थ पर विचार करें और यह आपके निर्णयों और कार्यों का मार्गदर्शन कैसे कर सकता है। यह हेक्साग्राम आपके जीवन के गहरे पैटर्न से बात करता है।",
-        reflection: "इस हेक्साग्राम के संदेश पर ध्यान करने का समय लें। आई चिंग आपके जीवन में परिवर्तन और रूपांतरण के गहरे पैटर्न से बात करता है। यह गहरे आत्म-चिंतन और आपकी व्यक्तिगत यात्रा में काम कर रही ब्रह्मांडीय शक्तियों की समझ का अवसर है।",
-        action: "इस हेक्साग्राम के मार्गदर्शन के आधार पर, विचार करें कि कौन से कार्य या परिवर्तन लाभकारी हो सकते हैं। याद रखें कि आई चिंग ज्ञान प्रदान करता है, कठोर नुस्खे नहीं। मार्गदर्शन आवेगी निर्णयों के बजाय विचारशील कार्य को प्रेरित करने के लिए है।"
-      },
-      es: {
-        timing: "Este hexagrama representa el momento actual en el viaje de tu vida. El momento sugiere que las energías y circunstancias están alineadas para que esta guía particular sea más relevante para tu situación. Considera cómo este momento en el tiempo se relaciona con tus desafíos actuales, oportunidades y el flujo natural de cambio en tu vida.",
-        application: "Considera cómo los temas de este hexagrama se aplican a tus desafíos o oportunidades actuales. Reflexiona sobre el significado simbólico y cómo podría guiar tus decisiones y acciones. Este hexagrama habla de los patrones más profundos de tu vida y ofrece sabiduría para navegar tus circunstancias actuales con gracia y comprensión.",
-        reflection: "Tómate tiempo para meditar en el mensaje de este hexagrama. El I Ching habla de los patrones más profundos de cambio y transformación en tu vida. Esta es una oportunidad para la reflexión profunda y la comprensión de las fuerzas cósmicas en trabajo en tu viaje personal. Permite que la sabiduría penetre tu conciencia y guíe tu conocimiento interior.",
-        action: "Basándote en la guía de este hexagrama, considera qué acciones o cambios podrían ser beneficiosos. Recuerda que el I Ching ofrece sabiduría, no prescripciones rígidas. La guía está destinada a inspirar acción reflexiva en lugar de decisiones impulsivas. Considera tanto pasos inmediatos como direcciones a largo plazo que se alineen con la sabiduría del hexagrama."
-      },
-      fr: {
-        timing: "Ce hexagramme représente le moment présent dans le voyage de votre vie. Le timing suggère que les énergies et les circonstances sont alignées pour que cette guidance particulière soit la plus pertinente pour votre situation. Considérez comment ce moment dans le temps se rapporte à vos défis actuels, opportunités et le flux naturel de changement dans votre vie.",
-        application: "Considérez comment les thèmes de ce hexagramme s'appliquent à vos défis ou opportunités actuels. Réfléchissez au sens symbolique et à la façon dont il pourrait guider vos décisions et actions. Ce hexagramme parle des modèles plus profonds de votre vie et offre de la sagesse pour naviguer vos circonstances actuelles avec grâce et compréhension.",
-        reflection: "Prenez le temps de méditer sur le message de ce hexagramme. Le I Ching parle des modèles plus profonds de changement et de transformation dans votre vie. C'est une opportunité pour la réflexion profonde et la compréhension des forces cosmiques en travail dans votre voyage personnel. Permettez à la sagesse de pénétrer votre conscience et de guider votre connaissance intérieure.",
-        action: "Basé sur la guidance de ce hexagramme, considérez quelles actions ou changements pourraient être bénéfiques. Rappelez-vous que le I Ching offre de la sagesse, pas des prescriptions rigides. La guidance est destinée à inspirer une action réfléchie plutôt que des décisions impulsives. Considérez à la fois des étapes immédiates et des directions à long terme qui s'alignent avec la sagesse du hexagramme."
-      },
-      ja: {
-        timing: "この六十四卦はあなたの人生の旅路における現在の瞬間を表しています。タイミングは、エネルギーと状況が整い、この特定の指導があなたの状況に最も関連性があることを示しています。この時点があなたの現在の課題、機会、そして人生における変化の自然な流れとどのように関連するかを考えてください。",
-        application: "この六十四卦のテーマがあなたの現在の課題や機会にどのように適用されるかを考えてください。象徴的な意味とそれがあなたの決定や行動をどのように導くかを反省してください。この六十四卦はあなたの人生のより深いパターンについて語り、現在の状況を優雅さと理解を持ってナビゲートするための知恵を提供します。",
-        reflection: "この六十四卦のメッセージについて瞑想する時間を取ってください。易経はあなたの人生における変化と変容のより深いパターンについて語ります。これは深い自己反省とあなたの個人的な旅路で働いている宇宙の力の理解の機会です。知恵があなたの意識に浸透し、あなたの内なる知識を導くことを許してください。",
-        action: "この六十四卦の指導に基づいて、どのような行動や変化が有益であるかを考えてください。易経は知恵を提供しますが、厳格な処方箋ではありません。指導は衝動的な決定ではなく、思慮深い行動を促すことを目的としています。六十四卦の知恵と一致する即座のステップと長期的な方向の両方を考慮してください。"
+        timing: "这个卦象代表你人生旅程中的当前时刻。",
+        application: "考虑这个卦象的主题如何适用于你当前的挑战。",
+        reflection: "花时间冥想这个卦象的信息。",
+        action: "基于这个卦象的指导，考虑什么行动可能有益。"
       }
     }
     
@@ -108,42 +95,29 @@ export default function DrawPage() {
   }
 
   const getPersonalInsights = (hexagram: HexagramTranslation) => {
+    // Get personal insights from database if available
+    if (hexagram.personal_insights) {
+      return hexagram.personal_insights[language] || hexagram.personal_insights.en || {
+        lifeArea: "This hexagram relates to your personal development.",
+        emotionalGuidance: "Consider your emotional state.",
+        practicalAdvice: "Apply practical wisdom.",
+        spiritualMessage: "Connect with spiritual meaning."
+      }
+    }
+    
+    // Fallback insights if not in database yet
     const insights = {
       en: {
-        lifeArea: "This hexagram particularly relates to your personal development and inner growth. It speaks to the fundamental aspects of your character and the way you approach life's challenges and opportunities.",
-        emotionalGuidance: "Emotionally, this hexagram suggests a time of balance and harmony, or perhaps a need to find balance in your emotional responses. It encourages you to trust your feelings while also maintaining perspective.",
-        practicalAdvice: "In practical terms, this hexagram advises patience and careful consideration before taking action. It suggests that the timing is important and that rushing into decisions may not serve your highest good.",
-        spiritualMessage: "Spiritually, this hexagram speaks to your connection with the divine and the natural order of things. It reminds you that you are part of a larger cosmic pattern and that your individual journey has meaning within this greater context."
+        lifeArea: "This hexagram relates to your personal development.",
+        emotionalGuidance: "Consider your emotional state.",
+        practicalAdvice: "Apply practical wisdom.",
+        spiritualMessage: "Connect with spiritual meaning."
       },
       zh: {
-        lifeArea: "这个卦象特别与你的个人发展和内在成长相关。它与你性格的基本方面以及你应对生活挑战和机遇的方式对话。",
-        emotionalGuidance: "在情感上，这个卦象暗示着平衡与和谐的时期，或者也许需要在你的情感反应中找到平衡。它鼓励你信任自己的感受，同时保持视角。",
-        practicalAdvice: "在实际方面，这个卦象建议在采取行动之前要有耐心和仔细考虑。它暗示时机很重要，匆忙做决定可能不会为你带来最大的好处。",
-        spiritualMessage: "在精神上，这个卦象与你与神圣和事物自然秩序的联系对话。它提醒你，你是更大宇宙模式的一部分，你的个人旅程在这个更大的背景中有意义。"
-      },
-      hi: {
-        lifeArea: "यह हेक्साग्राम विशेष रूप से आपके व्यक्तिगत विकास और आंतरिक विकास से संबंधित है। यह आपके चरित्र के मौलिक पहलुओं और जीवन की चुनौतियों और अवसरों से निपटने के तरीके से बात करता है।",
-        emotionalGuidance: "भावनात्मक रूप से, यह हेक्साग्राम संतुलन और सामंजस्य के समय का सुझाव देता है, या शायद आपकी भावनात्मक प्रतिक्रियाओं में संतुलन खोजने की आवश्यकता है।",
-        practicalAdvice: "व्यावहारिक रूप से, यह हेक्साग्राम कार्य करने से पहले धैर्य और सावधानीपूर्वक विचार की सलाह देता है। यह सुझाव देता है कि समय महत्वपूर्ण है।",
-        spiritualMessage: "आध्यात्मिक रूप से, यह हेक्साग्राम आपके दिव्य और चीजों के प्राकृतिक क्रम के साथ संबंध से बात करता है।"
-      },
-      es: {
-        lifeArea: "Este hexagrama se relaciona particularmente con tu desarrollo personal y crecimiento interior. Habla de los aspectos fundamentales de tu carácter y la forma en que abordas los desafíos y oportunidades de la vida.",
-        emotionalGuidance: "Emocionalmente, este hexagrama sugiere un tiempo de equilibrio y armonía, o tal vez una necesidad de encontrar equilibrio en tus respuestas emocionales. Te anima a confiar en tus sentimientos mientras mantienes perspectiva.",
-        practicalAdvice: "En términos prácticos, este hexagrama aconseja paciencia y consideración cuidadosa antes de tomar acción. Sugiere que el timing es importante y que apresurarse en decisiones puede no servir a tu mayor bien.",
-        spiritualMessage: "Espiritualmente, este hexagrama habla de tu conexión con lo divino y el orden natural de las cosas. Te recuerda que eres parte de un patrón cósmico más grande y que tu viaje individual tiene significado dentro de este contexto mayor."
-      },
-      fr: {
-        lifeArea: "Ce hexagramme se rapporte particulièrement à votre développement personnel et croissance intérieure. Il parle des aspects fondamentaux de votre caractère et de la façon dont vous abordez les défis et opportunités de la vie.",
-        emotionalGuidance: "Émotionnellement, ce hexagramme suggère un temps d'équilibre et d'harmonie, ou peut-être un besoin de trouver l'équilibre dans vos réponses émotionnelles. Il vous encourage à faire confiance à vos sentiments tout en maintenant la perspective.",
-        practicalAdvice: "En termes pratiques, ce hexagramme conseille la patience et la considération soigneuse avant d'agir. Il suggère que le timing est important et que se précipiter dans les décisions peut ne pas servir votre plus grand bien.",
-        spiritualMessage: "Spirituellement, ce hexagramme parle de votre connexion avec le divin et l'ordre naturel des choses. Il vous rappelle que vous faites partie d'un modèle cosmique plus grand et que votre voyage individuel a du sens dans ce contexte plus large."
-      },
-      ja: {
-        lifeArea: "この六十四卦は特にあなたの個人的な発達と内なる成長に関連しています。それはあなたの性格の基本的な側面と、人生の課題や機会にアプローチする方法について語ります。",
-        emotionalGuidance: "感情的には、この六十四卦はバランスと調和の時、またはあなたの感情的反応にバランスを見つける必要性を示唆しています。視点を保ちながら感情を信頼することを奨励します。",
-        practicalAdvice: "実用的には、この六十四卦は行動を起こす前に忍耐と慎重な考慮を勧めます。タイミングが重要であり、決定に急ぐことはあなたの最高の善に役立たないかもしれないことを示唆しています。",
-        spiritualMessage: "精神的には、この六十四卦はあなたの神聖なものとのつながりと物事の自然な秩序について語ります。あなたがより大きな宇宙のパターンの一部であり、あなたの個人的な旅路がこのより大きな文脈の中で意味を持つことを思い出させます。"
+        lifeArea: "这个卦象与你的个人发展相关。",
+        emotionalGuidance: "考虑你的情感状态。",
+        practicalAdvice: "应用实际智慧。",
+        spiritualMessage: "连接精神意义。"
       }
     }
     

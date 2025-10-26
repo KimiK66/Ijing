@@ -47,6 +47,24 @@ export interface HexagramTranslation {
   lines: HexagramLineTranslation[];
   interpretation: MultiLanguageText;
   keywords: MultiLanguageText;
+  detailed_guidance?: {
+    en: { timing: string; application: string; reflection: string; action: string };
+    zh: { timing: string; application: string; reflection: string; action: string };
+    hi: { timing: string; application: string; reflection: string; action: string };
+    es: { timing: string; application: string; reflection: string; action: string };
+    fr: { timing: string; application: string; reflection: string; action: string };
+    ja: { timing: string; application: string; reflection: string; action: string };
+    [key: string]: { timing: string; application: string; reflection: string; action: string };
+  };
+  personal_insights?: {
+    en: { lifeArea: string; emotionalGuidance: string; practicalAdvice: string; spiritualMessage: string };
+    zh: { lifeArea: string; emotionalGuidance: string; practicalAdvice: string; spiritualMessage: string };
+    hi: { lifeArea: string; emotionalGuidance: string; practicalAdvice: string; spiritualMessage: string };
+    es: { lifeArea: string; emotionalGuidance: string; practicalAdvice: string; spiritualMessage: string };
+    fr: { lifeArea: string; emotionalGuidance: string; practicalAdvice: string; spiritualMessage: string };
+    ja: { lifeArea: string; emotionalGuidance: string; practicalAdvice: string; spiritualMessage: string };
+    [key: string]: { lifeArea: string; emotionalGuidance: string; practicalAdvice: string; spiritualMessage: string };
+  };
   element: string;
   season: string;
 }
