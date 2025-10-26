@@ -21,7 +21,12 @@ export function ProfileButton() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+            scope: 'openid email profile'
+          }
         }
       })
       
@@ -29,7 +34,15 @@ export function ProfileButton() {
       
       if (error) {
         console.error('Sign in error:', error)
-        alert(`Sign in failed: ${error.message}`)
+        
+        // Provide more specific error messages
+        if (error.message.includes('provider') || error.message.includes('disabled')) {
+          alert('Google authentication is not configured yet. Please contact the administrator.')
+        } else if (error.message.includes('redirect')) {
+          alert('Authentication redirect URL is not configured. Please contact the administrator.')
+        } else {
+          alert(`Sign in failed: ${error.message}`)
+        }
         return
       }
       

@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     console.error('OAuth error:', error, errorDescription)
-    return NextResponse.redirect(`${origin}/?error=oauth_error&message=${encodeURIComponent(errorDescription || error)}`)
+    const errorMessage = errorDescription || error || 'Authentication failed'
+    return NextResponse.redirect(`${origin}/?error=oauth_error&message=${encodeURIComponent(errorMessage)}`)
   }
 
   if (code) {
@@ -35,6 +36,7 @@ export async function GET(request: NextRequest) {
         }
       )
 
+      // Handle the OAuth callback by exchanging the code for a session
       const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
       
       if (exchangeError) {
@@ -46,8 +48,8 @@ export async function GET(request: NextRequest) {
       console.log('User:', data.user?.email)
       console.log('Session:', data.session ? 'created' : 'missing')
       
-      // Redirect to profile with success
-      return NextResponse.redirect(`${origin}/profile?success=true`)
+      // Redirect to profile page after successful authentication
+      return NextResponse.redirect(`${origin}/profile`)
     } catch (error) {
       console.error('Auth callback error:', error)
       return NextResponse.redirect(`${origin}/?error=callback_error&message=${encodeURIComponent(String(error))}`)

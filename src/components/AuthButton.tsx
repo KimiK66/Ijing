@@ -30,7 +30,15 @@ export function AuthButton() {
       
       if (error) {
         console.error('Sign in error:', error)
-        alert(`Sign in failed: ${error.message}`)
+        
+        // Provide more specific error messages
+        if (error.message.includes('provider') || error.message.includes('disabled')) {
+          alert('Google authentication is not configured yet. Please contact the administrator.')
+        } else if (error.message.includes('redirect')) {
+          alert('Authentication redirect URL is not configured. Please contact the administrator.')
+        } else {
+          alert(`Sign in failed: ${error.message}`)
+        }
         return
       }
       
@@ -41,11 +49,11 @@ export function AuthButton() {
         window.location.href = data.url
       } else {
         console.error('No redirect URL received')
-        alert('Authentication failed: No redirect URL received')
+        alert('Authentication failed: No redirect URL received. Google OAuth may not be configured.')
       }
     } catch (error) {
       console.error('Sign in error:', error)
-      alert(`Sign in failed: ${error}`)
+      alert(`Sign in failed: ${error}. Please check if Google OAuth is properly configured.`)
     } finally {
       setIsLoading(false)
     }
