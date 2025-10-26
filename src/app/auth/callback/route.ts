@@ -22,9 +22,7 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     try {
-      const response = NextResponse.redirect(`${origin}/profile`)
-      
-      // Exchange the code for a session and set cookies
+      // Exchange the code for a session first
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -50,11 +48,20 @@ export async function GET(request: NextRequest) {
       console.log('User:', data.user?.email)
       console.log('Session:', data.session ? 'created' : 'missing')
       
-      // Set session cookies in the response
+      // Session is automatically persisted by Supabase
+      console.log('Session created successfully, redirecting to profile')
+      
+      // Create redirect response with session cookies
+      const response = NextResponse.redirect(`${origin}/profile`)
+      
+      // Set the session tokens in cookies if available
       if (data.session) {
-        // Get all cookies from Supabase
-        const cookies = supabase.auth.getCookies()
-        console.log('Setting session cookies:', cookies)
+        response.cookies.set('supabase.auth.token', data.session.access_token, {
+          path: '/',
+          httpOnly: false,
+          secure: true,
+          sameSite: 'lax'
+        })
       }
       
       return response
